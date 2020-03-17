@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
-import { ImageBackground, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Spit from './Spit'
 import Settings from './Settings'
@@ -14,17 +19,20 @@ class Main extends Component {
         source={require('../assets/MainScreen_ttable.png')}
         style={styles.backgroundImage}
         >
+        <Image
+          source={require('../assets/SPIT_Grid_bars.png')}
+        />
       </ImageBackground>
     )
   }
 }
-
+  i
 const styles= StyleSheet.create({
   backgroundImage: {
     alignItems: 'center',
     flex: 1,
     height: '90%',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     width: '100%',
   }
 })

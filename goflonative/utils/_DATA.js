@@ -5,7 +5,7 @@ let users= {
     follows:['DeCepT1oN', 'CARNAG3', 'BOO BOT'],
     followers:['DeCepT1oN', 'CARNAG3', 'BOO BOT'],
     password: 'fastSwimmers89',
-    profilePic: 'images/newbieCloud.jpg',
+    profilePic: require('../assets/newbieCloud.jpg'),
     rankedBattles: {
       wins: 100,
       loses:0,
@@ -18,7 +18,7 @@ let users= {
     follows:['wombraider', 'CARNAG3', 'BOO BOT'],
     followers:['wombraider', 'CARNAG3', 'BOO BOT'],
     password: 'goflonominal',
-    profilePic: 'images/masterChief.jpg',
+    profilePic: 'assets/masterChief.jpg',
     rankedBattles: {
       wins: 0,
       loses: 100,
@@ -30,7 +30,7 @@ let users= {
     follows:['wombraider', 'DeCepT1oN', 'BOO BOT'],
     followers:['wombraider', 'DeCepT1oN', 'BOO BOT'],
     password: 'seosbrisbest',
-    profilePic: 'images/carnageProfile.jpg',
+    profilePic: 'assets/carnageProfile.jpg',
     rankedBattles: {
       wins: 0,
       loses: 100,
