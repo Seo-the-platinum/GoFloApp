@@ -2,40 +2,40 @@
 
 let users= {
   wombraider: {
-    follows:['DeCepT1oN', 'CARNAG3', 'BOO BOT'],
-    followers:['DeCepT1oN', 'CARNAG3', 'BOO BOT'],
+    follows:['DeCepT1oN', 'CARNAG3'],
+    followers:['DeCepT1oN', 'CARNAG3'],
     password: 'fastSwimmers89',
     profilePic: require('../assets/newbieCloud.jpg'),
     rankedBattles: {
       wins: 100,
       loses:0,
     },
-    status: 'offline',
+    online: false,
     userName: 'wombraider',
 
   },
   DeCepT1oN: {
-    follows:['wombraider', 'CARNAG3', 'BOO BOT'],
-    followers:['wombraider', 'CARNAG3', 'BOO BOT'],
+    follows:['wombraider', 'CARNAG3'],
+    followers:['wombraider', 'CARNAG3'],
     password: 'goflonominal',
-    profilePic: 'assets/masterChief.jpg',
+    profilePic: require('../assets/masterChief.jpg'),
     rankedBattles: {
       wins: 0,
       loses: 100,
     },
-    status: 'offline',
+    online: false,
     userName: 'DeCepT1oN',
   },
   CARNAG3: {
-    follows:['wombraider', 'DeCepT1oN', 'BOO BOT'],
-    followers:['wombraider', 'DeCepT1oN', 'BOO BOT'],
+    follows:['wombraider', 'DeCepT1oN'],
+    followers:['wombraider', 'DeCepT1oN'],
     password: 'seosbrisbest',
-    profilePic: 'assets/carnageProfile.jpg',
+    profilePic: require('../assets/carnageProfile.jpg'),
     rankedBattles: {
       wins: 0,
       loses: 100,
     },
-    status: 'offline',
+    online: false,
     userName: 'CARNAG3',
   },
 }

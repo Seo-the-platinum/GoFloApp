@@ -5,10 +5,11 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet } from 'react-native'
-  import { connect } from 'react-redux'
-  import handleInitialData from '../actions/shared'
-  import { setAuthedUser } from '../actions/authedUser'
-  import { useNavigation } from '@react-navigation/native'
+import { connect } from 'react-redux'
+import handleInitialData from '../actions/shared'
+import { setAuthedUser } from '../actions/authedUser'
+import { toggleStatus } from '../actions/users'
+import { useNavigation } from '@react-navigation/native'
 
 
 class LoginField extends Component {
@@ -50,7 +51,9 @@ class LoginField extends Component {
       username: '',
       password: '',
       redirect: true,
-    }), ()=> dispatch(setAuthedUser(username)))
+    }), ()=> {dispatch(setAuthedUser(username))
+              dispatch(toggleStatus(username))}
+      )
     :
     this.setState(currState=> ({
       currState,

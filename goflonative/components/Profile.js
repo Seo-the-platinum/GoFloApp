@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View } from 'react-native'
 import { connect } from 'react-redux'
-
+import FriendsList from './FriendsList'
 
 class Profile extends Component {
 
@@ -22,21 +22,110 @@ class Profile extends Component {
             > { authedUser }</Text>
         </View>
         <View style={styles.ProfileTop}>
-          <Image source={pic}/>
+          <Image
+            source={pic}
+            style={{flex: 1}}/>
           <View style={styles.buttonsContainer}>
             <TouchableOpacity style={styles.buttonContainer}>
-              <Text>Tracks</Text>
+              <ImageBackground
+                source={require('../assets/SPIT_Grid_bars.png')}
+                style={styles.backgroundImage}
+                >
+                <ImageBackground
+                  source={require('../assets/SPIT_B_bars.png')}
+                  style={styles.layeredBackgroundImage}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
+                  <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: 'bold'}}>
+                    Artist Page</Text>
+                </ImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>Leaderboards</Text>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <ImageBackground
+                source={require('../assets/SPIT_Grid_bars.png')}
+                style={styles.backgroundImage}
+              >
+                <ImageBackground
+                  source={require('../assets/SPIT_W_bars.png')}
+                  style={styles.layeredBackgroundImage}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
+                  <Text
+                    style={{
+                    fontWeight: 'bold'}}>
+                    Tracks
+                  </Text>
+                </ImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>Customize</Text>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <ImageBackground
+                source={require('../assets/SPIT_Grid_bars.png')}
+                style={styles.backgroundImage}
+              >
+                <ImageBackground
+                  source={require('../assets/SPIT_W_bars.png')}
+                  style={styles.layeredBackgroundImage}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
+                  <Text
+                    style={{
+                    fontWeight: 'bold'}}>
+                    Leaderboards
+                  </Text>
+                </ImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text>Messages</Text>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <ImageBackground
+                source={require('../assets/SPIT_Grid_bars.png')}
+                style={styles.backgroundImage}
+                >
+                <ImageBackground
+                  source={require('../assets/SPIT_W_bars.png')}
+                  style={styles.layeredBackgroundImage}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
+                  <Text
+                    style={{
+                    fontWeight: 'bold'}}>
+                    Customize
+                  </Text>
+                </ImageBackground>
+              </ImageBackground>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonContainer}>
+              <ImageBackground
+                source={require('../assets/SPIT_Grid_bars.png')}
+                style={styles.backgroundImage}
+                >
+                <ImageBackground
+                  source={require('../assets/SPIT_W_bars.png')}
+                  style={styles.layeredBackgroundImage}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
+                  <Text
+                    style={{
+                    fontWeight: 'bold',
+                    }}>
+                    Messages
+                  </Text>
+                </ImageBackground>
+              </ImageBackground>
             </TouchableOpacity>
           </View>
+        </View>
+        <FriendsList/>
+        <View style={styles.gridView}>
+          <Image
+            source={require('../assets/SPIT_Grid_bars.png')}
+            style={{width: '100%'}}
+            imageStyle={{resizeMode: 'contain'}}
+          />
         </View>
       </View>
     )
@@ -45,19 +134,28 @@ class Profile extends Component {
 
 const styles= StyleSheet.create({
   backgroundImage: {
-    alignItems: 'center',
-    height: '100%',
+    alignItems: 'flex-end',
+    flex: 1,
     justifyContent: 'center',
     width: '100%',
   },
-  buttonContainer: {
-    height: '20%',
+  layeredBackgroundImage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
     width: '100%',
   },
+  buttonContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
   buttonsContainer: {
-    borderColor: 'green',
-    borderWidth: 2,
+    flex: 2,
     width: '100%',
+  },
+  gridView: {
+    position: 'relative',
+    top: '43%',
   },
   ProfileHeader: {
     alignItems: 'center',
@@ -70,8 +168,6 @@ const styles= StyleSheet.create({
     fontSize: 24,
   },
   ProfileTop: {
-    borderColor: 'orange',
-    borderWidth: 2,
     flexDirection: 'row',
   },
 

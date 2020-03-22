@@ -26,7 +26,7 @@ class Main extends Component {
     )
   }
 }
-  i
+
 const styles= StyleSheet.create({
   backgroundImage: {
     alignItems: 'center',
