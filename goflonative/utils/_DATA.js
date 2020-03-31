@@ -12,6 +12,9 @@ let users= {
     },
     online: false,
     userName: 'wombraider',
+    tracks: [
+      '../assets/sounds/The_Pleasurables-Heaven&Hell.mp3',
+    ],
 
   },
   DeCepT1oN: {

@@ -8,11 +8,76 @@ import {
   View } from 'react-native'
 import { connect } from 'react-redux'
 import FriendsList from './FriendsList'
+import { Audio } from 'expo-av'
 
 class Profile extends Component {
 
+  state= {
+    playingStatus: 'nosound',
+  }
+
+  _playRecording = async ()=> {
+    const { sound }= await Audio.Sound.createAsync(
+      require('../assets/sounds/heavenandhell.mp3'),
+      {
+        shouldPlay: true,
+        isLooping: false,
+      },
+      this._updateScreenForSoundStatus,
+    );
+    this.sound= sound
+    this.setState(currState=> ({
+      playingStatus: 'playing',
+    }))
+  }
+
+  _updateScreenForSoundStatus = (status) => {
+    if (status.isPlaying && this.state.playingStatus !== "playing") {
+      this.setState({ playingStatus: "playing" });
+    } else if (!status.isPlaying && this.state.playingStatus === "playing") {
+      this.setState({ playingStatus: "donepause" });
+    }
+  };
+
+  _pauseAndPlayRecording= async ()=> {
+    if ( this.sound != null) {
+      if (this.state.playingStatus == 'playing') {
+        console.log('pausing...')
+        await this.sound.pauseAsync();
+        console.log('paused')
+        this.setState(currState=> ({
+          playingStatus: 'donepause'
+        }));
+      } else {
+        console.log('playing...')
+        await this.sound.playAsync();
+        console.log('playing')
+        this.setState({
+          playingStatus: 'playing',
+        })
+      }
+    }
+  }
+
+
+  _playAndPause = ()=> {
+    console.log(this.state.playingStatus)
+    switch (this.state.playingStatus) {
+      case 'nosound':
+        this._playRecording()
+        break;
+      case 'donepause':
+      case 'playing':
+        this._pauseAndPlayRecording();
+        break;
+      default:
+      return;
+    }
+  }
+
   render() {
     const { authedUser, users }= this.props
+
     const pic= users[authedUser].profilePic
     return (
       <View>
@@ -127,6 +192,10 @@ class Profile extends Component {
             imageStyle={{resizeMode: 'contain'}}
           />
         </View>
+        <TouchableOpacity
+          onPress={()=> this._playAndPause()}>
+          <Text> Play</Text>
+        </TouchableOpacity>
       </View>
     )
   }
