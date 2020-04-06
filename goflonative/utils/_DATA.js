@@ -2,6 +2,9 @@
 
 let users= {
   wombraider: {
+    artistName: 'The Pleasurables',
+    artistAbout: `An alt rock/ alt punk band based out of Los Angeles.`,
+    favoriteArtist: ['Blink182','Arctic Monkeys','The Strokes'],
     follows:['DeCepT1oN', 'CARNAG3'],
     followers:['DeCepT1oN', 'CARNAG3'],
     password: 'fastSwimmers89',
@@ -11,11 +14,10 @@ let users= {
       loses:0,
     },
     online: false,
-    userName: 'wombraider',
     tracks: [
       '../assets/sounds/The_Pleasurables-Heaven&Hell.mp3',
     ],
-
+    userName: 'wombraider',
   },
   DeCepT1oN: {
     follows:['wombraider', 'CARNAG3'],

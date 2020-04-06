@@ -5,12 +5,13 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { connect } from 'react-redux'
 import Login from './Login'
 import Main from './Main'
-import Profile from './Profile'
+import ProfileStack from './ProfileStack'
 import Settings from './Settings'
 
 const Stack= createStackNavigator();
 
 const Tab= createBottomTabNavigator();
+
 function HomeTabs() {
   return (
     <Tab.Navigator
@@ -48,7 +49,7 @@ function HomeTabs() {
           }
         }}
         name='Profile'
-        component={Profile}/>
+        component={ProfileStack}/>
       <Tab.Screen
         options={{
           tabBarIcon: ({ focused })=> {
@@ -66,8 +67,7 @@ function HomeTabs() {
             )
           }
         }}
-        name='Settings'
-        component={Settings}/>
+        name='Settings' component={Settings}/>
     </Tab.Navigator>
   )
 }

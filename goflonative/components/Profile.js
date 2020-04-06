@@ -9,36 +9,59 @@ import {
 import { connect } from 'react-redux'
 import FriendsList from './FriendsList'
 import { Audio } from 'expo-av'
+import { createStackNavigator } from '@react-navigation/stack'
+import ArtistPage from './ArtistPage'
+
+
 
 class Profile extends Component {
 
   state= {
     playingStatus: 'nosound',
   }
-
+//the play recording function is an async function
   _playRecording = async ()=> {
+    /* sound is declared, contains the audio.sound object
+    when _playRecording is called, it is paused by the await
+    tag. once the audio.sound.createAsync is finished,
+    _playRecording will continue*/
     const { sound }= await Audio.Sound.createAsync(
+      /*we pass createAsync an audio source and an object
+      to set the initialStatus prop of audio.sound*/
       require('../assets/sounds/heavenandhell.mp3'),
       {
         shouldPlay: true,
         isLooping: false,
       },
+      /* uses this._updateScreenForSoundStatus for the
+      onPlaybackStatusUpdate prop*/
       this._updateScreenForSoundStatus,
     );
     this.sound= sound
+    // updates state to show that sound is playing
     this.setState(currState=> ({
       playingStatus: 'playing',
     }))
   }
 
+/*_updateScreenForSoundStatus takes status as a parameter
+and receives it from the createAsync object. */
   _updateScreenForSoundStatus = (status) => {
+    /*if audio.sound.status.isPlaying is true and playingStatus
+    does not equal playing, the setstate to playing */
     if (status.isPlaying && this.state.playingStatus !== "playing") {
       this.setState({ playingStatus: "playing" });
+      /* if isPlaying is not true and playingstatus is playingStatus
+      change state to donepause*/
     } else if (!status.isPlaying && this.state.playingStatus === "playing") {
       this.setState({ playingStatus: "donepause" });
     }
   };
 
+  /* checks to see if the value of sound doesn't equal null
+  if it doesn't checks playingStatus, if playing,
+  await this.sound.pauseAsync is called to pause sound.
+  else await this.sound.playAsync is called to play sound*/
   _pauseAndPlayRecording= async ()=> {
     if ( this.sound != null) {
       if (this.state.playingStatus == 'playing') {
@@ -75,10 +98,30 @@ class Profile extends Component {
     }
   }
 
+  linkToArtist=()=> {
+    this.props.navigation.navigate('ArtistPage')
+  }
+
+  linkToTracks=()=> {
+    this.props.navigation.navigate('Tracks')
+  }
+
+  linkToLeaderboards=()=> {
+    this.props.navigation.navigate('Leaderboards')
+  }
+
+  linkToCustomize=()=> {
+    this.props.navigation.navigate('Customize')
+  }
+
+  linkToMessages=()=> {
+    this.props.navigation.navigate('Messages')
+  }
+
   render() {
     const { authedUser, users }= this.props
-
     const pic= users[authedUser].profilePic
+
     return (
       <View>
         <View style={styles.ProfileHeader}>
@@ -91,7 +134,9 @@ class Profile extends Component {
             source={pic}
             style={{flex: 1}}/>
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={this.linkToArtist}>
               <ImageBackground
                 source={require('../assets/SPIT_Grid_bars.png')}
                 style={styles.backgroundImage}
@@ -109,7 +154,10 @@ class Profile extends Component {
                 </ImageBackground>
               </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={this.linkToTracks}
+            >
               <ImageBackground
                 source={require('../assets/SPIT_Grid_bars.png')}
                 style={styles.backgroundImage}
@@ -127,7 +175,10 @@ class Profile extends Component {
                 </ImageBackground>
               </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={this.linkToLeaderboards}
+            >
               <ImageBackground
                 source={require('../assets/SPIT_Grid_bars.png')}
                 style={styles.backgroundImage}
@@ -145,7 +196,10 @@ class Profile extends Component {
                 </ImageBackground>
               </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={this.linkToCustomize}
+              >
               <ImageBackground
                 source={require('../assets/SPIT_Grid_bars.png')}
                 style={styles.backgroundImage}
@@ -163,7 +217,10 @@ class Profile extends Component {
                 </ImageBackground>
               </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={this.linkToMessages}
+            >
               <ImageBackground
                 source={require('../assets/SPIT_Grid_bars.png')}
                 style={styles.backgroundImage}
@@ -194,7 +251,13 @@ class Profile extends Component {
         </View>
         <TouchableOpacity
           onPress={()=> this._playAndPause()}>
-          <Text> Play</Text>
+          {this.state.playingStatus === 'playing' ? (
+              <Text> Pause</Text>
+          )
+          :
+          (
+            <Text> Play</Text>
+          )}
         </TouchableOpacity>
       </View>
     )
