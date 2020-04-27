@@ -6,6 +6,7 @@ import {
   View } from 'react-native'
 import { connect } from 'react-redux'
 import Track from './Track'
+import TrackPlayer from './TrackPlayer'
 
 class Tracks extends Component {
   render() {
@@ -35,8 +36,14 @@ class Tracks extends Component {
           </ImageBackground>
         </View>
         {tracks.map(t => {
-          return <Track key={t} track={t}/>
+          return <Track
+                   key={t}
+                   track={t}
+                  />
         })}
+        <View>
+          <TrackPlayer tracks={tracks}/>
+        </View>
       </View>
     )
   }

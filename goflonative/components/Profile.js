@@ -12,8 +12,6 @@ import { Audio } from 'expo-av'
 import { createStackNavigator } from '@react-navigation/stack'
 import ArtistPage from './ArtistPage'
 
-
-
 class Profile extends Component {
 
   state= {
@@ -99,7 +97,6 @@ and receives it from the createAsync object. */
 
 
   _playAndPause = ()=> {
-    console.log(this.state.playingStatus)
     switch (this.state.playingStatus) {
       case 'nosound':
         this._playRecording()

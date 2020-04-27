@@ -10,11 +10,14 @@ import { connect } from 'react-redux'
 import { Audio } from 'expo-av'
 
  class Track extends Component {
+
+
    render() {
      const { users, authedUser, track }= this.props
      const producer= users[authedUser].tracks[track].producer
      const genre= users[authedUser].tracks[track].genre
      const title= users[authedUser].tracks[track].title
+
      return (
        <View style={styles.container}>
          <View style={{flex: 1}}>

@@ -10,7 +10,6 @@ export default function users(state={}, action) {
     }
     case TOGGLE_STATUS:
     const { user }= action
-    console.log(user)
     return {
       ...state,
       [user]: {
