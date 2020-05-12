@@ -7,9 +7,11 @@ import {
   View } from 'react-native'
 import { connect } from 'react-redux'
 import { Audio } from 'expo-av'
+import { Slider } from 'react-native'
 
 
 class TrackPlayer extends Component {
+
   state={
     playingStatus: 'nosound',
     secs: 0,
@@ -17,6 +19,7 @@ class TrackPlayer extends Component {
     total: 0,
     playList: [],
     index: 0,
+    rate: 0,
   }
   componentDidMount() {
     const { users, authedUser, tracks }= this.props
@@ -32,7 +35,11 @@ class TrackPlayer extends Component {
       playList: trackList,
     }))
   }
-  
+
+  componentWillUnmount() {
+    this._isMounted= false
+  }
+
   _playAndPause= ()=> {
     switch (this.state.playingStatus) {
       case 'nosound':
@@ -73,6 +80,13 @@ class TrackPlayer extends Component {
   }
 
   _updateScreenForSoundStatus = (status) => {
+    console.log(Math.round((status.positionMillis /status.durationMillis)*100)/100)
+    setTimeout(()=> {
+      this.setState(currState=> ({
+        ...currState,
+        rate: Math.round((status.positionMillis /status.durationMillis)*100)/100,
+      }))
+    }, 500)
     this.setState(currState=> ({
       ...currState,
       secs: Math.round(status.positionMillis / 1000 %60),
@@ -96,19 +110,7 @@ class TrackPlayer extends Component {
     }
   };
 
-  _playNext= async ()=> {
-    const { playingStatus, index, playList }= this.state
-      if (this.sound != null) {
-        console.log('playing...' + index)
-        await this.sound.playAsync();
-        console.log('playing')
-        this.setState(currState=>({
-          playingStatus: 'playing',
-        }))
-      }
-    }
-
-  _pauseAndPlayRecording= async ()=> {
+_pauseAndPlayRecording= async ()=> {
     if ( this.sound != null) {
       if (this.state.playingStatus == 'playing') {
         console.log('pausing...')
@@ -128,7 +130,7 @@ class TrackPlayer extends Component {
     }
   }
 
-  _nextTrack= async ()=> {
+_nextTrack= async ()=> {
     const { index, playList, playingStatus }= this.state
 
     if ( playingStatus === 'playing') {
@@ -137,46 +139,141 @@ class TrackPlayer extends Component {
       console.log('stopped')
       this.setState(currState=> ({
         playingStatus: 'nosound',
-      }), ()=> {
-        if (index === playList.length -1) {
-        this.setState(currState=> ({
-          ...currState,
-          index: 0,
-        }), ()=> this._playRecording())
-      } else {
-        this.setState(currState=> ({
-          ...currState,
-          index: currState.index + 1,
-        }), ()=>this._playRecording())
-      }
+      }), ()=> this._increaseIndex())
+  }
+  if ( playingStatus === 'nosound' || playingStatus === 'donepause') {
+    this._increaseIndex()
+  }
+}
+
+_increaseIndex= ()=> {
+    const { index, playList }= this.state
+
+    if (index === playList.length -1) {
+      this.setState(currState=> ({
+        ...currState,
+        index: 0,
+      }), ()=> this._playRecording())
+    } else {
+      this.setState(currState=> ({
+        ...currState,
+        index: currState.index + 1,
+      }), ()=>this._playRecording())
+    }
+  }
+
+_prevTrack= async ()=> {
+  const { index, playList, playingStatus }= this.state
+
+  if ( playingStatus === 'playing') {
+    console.log('stopping...')
+    await this.sound.stopAsync();
+    console.log('stopped')
+    this.setState(currState=> ({
+      playingStatus: 'nosound',
+    }), ()=> {
+      this._decreaseIndex()
     })
+  }
+  if ( playingStatus === 'nosound' || playingStatus === 'donepause') {
+    this._decreaseIndex()
+  }
+}
+
+_decreaseIndex= ()=> {
+  const { index, playList }= this.state
+
+  if (index === 0) {
+  this.setState(currState=> ({
+    ...currState,
+    index: playList.length -1,
+  }), ()=> this._playRecording())
+} else {
+    this.setState(currState=> ({
+      ...currState,
+      index: currState.index - 1,
+    }), ()=>this._playRecording())
   }
 }
   render() {
-    const { tracks }= this.props
-    const { playList, index }= this.state
-
+    const { authedUser, tracks, users }= this.props
+    const { index, playList, mins, secs, total, rate }= this.state
     return (
-      <View>
-        <View>
-          <Text>Title</Text>
-          <Text>Artist</Text>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            {users[authedUser].tracks[tracks[index]].title}
+          </Text>
+          <Text style={styles.producer}>
+            {users[authedUser].tracks[tracks[index]].producer}
+          </Text>
         </View>
-        <TouchableOpacity
-          onPress={this._playAndPause}>
-          <Image source={require('../assets/playBtn.jpg')}/>
-        </TouchableOpacity>
-        <View>
-          <TouchableOpacity onPress={this._nextTrack}>
+        <View style={styles.player}>
+          <View style={ styles.playerBtns}>
+            <TouchableOpacity onPress={this._prevTrack}>
+              <Text>
+                Prev
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={this._playAndPause}>
+              <Image
+                source={require('../assets/playBtn.jpg')}
+                style={{
+                  width: 50,
+                  height: 50}}/>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this._nextTrack}>
+              <Text>
+                Next
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <Slider/>
             <Text>
-              Next
+              {`${mins}: ${secs} / ${total}`}
             </Text>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
   }
 }
+
+const styles= StyleSheet.create({
+
+  container: {
+    borderColor: 'blue',
+    borderWidth: 1,
+    flexDirection: 'column',
+  },
+
+  header: {
+    borderColor: 'green',
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  player: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+
+  playerBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+
+  producer: {
+    fontWeight: 'bold',
+  },
+
+  title: {
+    fontWeight: 'bold',
+  }
+})
 
 function mapStateToProps({users, authedUser}) {
   return {
