@@ -10,8 +10,6 @@ import { connect } from 'react-redux'
 import { Audio } from 'expo-av'
 
  class Track extends Component {
-
-
    render() {
      const { users, authedUser, track }= this.props
      const producer= users[authedUser].tracks[track].producer
@@ -24,13 +22,6 @@ import { Audio } from 'expo-av'
            <Text>
              {title}
            </Text>
-         </View>
-         <View style={styles.buttonView}>
-           <TouchableOpacity>
-             <ImageBackground
-               source={require('../assets/playBtn.jpg')}
-               style={styles.buttonImage}/>
-           </TouchableOpacity>
          </View>
          <View style={{flex: 1}}>
            <Text>

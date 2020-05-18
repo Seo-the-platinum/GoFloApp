@@ -8,36 +8,41 @@ import {
 import { connect } from 'react-redux'
 import { Audio } from 'expo-av'
 import { Slider } from 'react-native'
+import { AntDesign, Fontisto } from '@expo/vector-icons'
 
+let _isMounted= false
 
 class TrackPlayer extends Component {
 
   state={
     playingStatus: 'nosound',
-    secs: 0,
-    mins: 0,
-    total: 0,
     playList: [],
     index: 0,
-    rate: 0,
+    currentMillis: null,
+    totalMillis: null,
+    timer: null,
   }
   componentDidMount() {
+    _isMounted= true
     const { users, authedUser, tracks }= this.props
     const trackList= tracks.map(s=> {
-      return {
-        title: users[authedUser].tracks[s].title,
-        source: users[authedUser].tracks[s].source,
-        producer: users[authedUser].tracks[s].producer,
-      }
-    })
-    this.setState(currState=> ({
-      ...currState,
-      playList: trackList,
-    }))
+        return {
+          title: users[authedUser].tracks[s].title,
+          source: users[authedUser].tracks[s].source,
+          producer: users[authedUser].tracks[s].producer,
+        }
+      })
+    if (_isMounted) {
+      this.setState(currState=> ({
+        ...currState,
+        playList: trackList,
+      }))
+    }
   }
 
   componentWillUnmount() {
-    this._isMounted= false
+    this.sound.stopAsync()
+    _isMounted= false
   }
 
   _playAndPause= ()=> {
@@ -80,24 +85,12 @@ class TrackPlayer extends Component {
   }
 
   _updateScreenForSoundStatus = (status) => {
-    console.log(Math.round((status.positionMillis /status.durationMillis)*100)/100)
-    setTimeout(()=> {
-      this.setState(currState=> ({
-        ...currState,
-        rate: Math.round((status.positionMillis /status.durationMillis)*100)/100,
-      }))
-    }, 500)
     this.setState(currState=> ({
       ...currState,
-      secs: Math.round(status.positionMillis / 1000 %60),
-      total: `${Math.floor(status.durationMillis / 60000)}: ${Math.floor(status.durationMillis/ 1000 % 60)}`,
-    }))
-    if (this.state.secs >= 60) {
-      this.setState(currState=> ({
-        ...currState,
-        mins: this.state.mins + 1,
-      }))
-    }
+      currentMillis: status.positionMillis,
+      totalMillis: status.durationMillis,
+    }), ()=> this.buildTimer())
+
 
     /*if audio.sound.status.isPlaying is true and playingStatus
     does not equal playing, the setstate to playing */
@@ -110,7 +103,7 @@ class TrackPlayer extends Component {
     }
   };
 
-_pauseAndPlayRecording= async ()=> {
+  _pauseAndPlayRecording= async ()=> {
     if ( this.sound != null) {
       if (this.state.playingStatus == 'playing') {
         console.log('pausing...')
@@ -130,7 +123,7 @@ _pauseAndPlayRecording= async ()=> {
     }
   }
 
-_nextTrack= async ()=> {
+  _nextTrack= async ()=> {
     const { index, playList, playingStatus }= this.state
 
     if ( playingStatus === 'playing') {
@@ -146,7 +139,7 @@ _nextTrack= async ()=> {
   }
 }
 
-_increaseIndex= ()=> {
+  _increaseIndex= ()=> {
     const { index, playList }= this.state
 
     if (index === playList.length -1) {
@@ -162,7 +155,7 @@ _increaseIndex= ()=> {
     }
   }
 
-_prevTrack= async ()=> {
+  _prevTrack= async ()=> {
   const { index, playList, playingStatus }= this.state
 
   if ( playingStatus === 'playing') {
@@ -180,7 +173,7 @@ _prevTrack= async ()=> {
   }
 }
 
-_decreaseIndex= ()=> {
+  _decreaseIndex= ()=> {
   const { index, playList }= this.state
 
   if (index === 0) {
@@ -195,9 +188,57 @@ _decreaseIndex= ()=> {
     }), ()=>this._playRecording())
   }
 }
+
+  _getSliderPosition= ()=> {
+  const { currentMillis, totalMillis }= this.state
+  if ( currentMillis && totalMillis !== null) {
+    return currentMillis / totalMillis
+  } else {
+  return  0
+  }
+}
+
+  _onChangeSliderPosition= async ()=> {
+  await this.sound.pauseAsync()
+}
+
+  _onSliderComplete= async (value)=> {
+  const { totalMillis }= this.state
+  const seekPosition= value * totalMillis
+  this.sound.playFromPositionAsync(seekPosition)
+}
+
+  buildTimer= ()=> {
+    const { currentMillis, totalMillis }= this.state
+    const totalMins= `0${Math.floor(totalMillis/ 60000)}`
+    const totalSecs= `${Math.floor(totalMillis/ 1000) % 60}`
+    const secs= ()=> {
+      if (Math.floor(currentMillis / 1000) % 60 < 10) {
+        return `0${Math.floor(currentMillis / 1000) % 60}`
+      } else {
+        return Math.floor(currentMillis / 1000) % 60
+      }
+    }
+    const mins= `0${Math.floor(currentMillis/ 60000)}`
+
+    if ( totalSecs < 10 ) {
+      let total=`${mins}:${secs()}/${totalMins}:0${totalSecs}`
+      this.setState(currState=> ({
+        ...currState,
+        timer: total,
+      }))
+    } else {
+      let total= `${mins}:${secs()}/${totalMins}:${totalSecs}`
+      this.setState(currState=> ({
+        ...currState,
+        timer: total,
+      }))
+    }
+
+ }
   render() {
     const { authedUser, tracks, users }= this.props
-    const { index, playList, mins, secs, total, rate }= this.state
+    const { index, playList, timer, playingStatus }= this.state
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -211,29 +252,43 @@ _decreaseIndex= ()=> {
         <View style={styles.player}>
           <View style={ styles.playerBtns}>
             <TouchableOpacity onPress={this._prevTrack}>
-              <Text>
-                Prev
-              </Text>
+            <AntDesign
+              name='banckward'
+              size={24}
+              color='black'/>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={this._playAndPause}>
-              <Image
-                source={require('../assets/playBtn.jpg')}
-                style={{
-                  width: 50,
-                  height: 50}}/>
+              { playingStatus === 'playing' ?
+              <Fontisto
+                name='pause'
+                size={24}
+                color='black'/>
+              :
+              <Fontisto
+                name='play'
+                size={24}
+                color='black'/>}
             </TouchableOpacity>
             <TouchableOpacity onPress={this._nextTrack}>
-              <Text>
-                Next
-              </Text>
+              <AntDesign
+                name='forward'
+                size={24}
+                color='black'/>
             </TouchableOpacity>
           </View>
           <View>
-            <Slider/>
-            <Text>
-              {`${mins}: ${secs} / ${total}`}
-            </Text>
+            <Slider
+              value={this._getSliderPosition()}
+              onValueChange={this._onChangeSliderPosition}
+              onSlidingComplete={this._onSliderComplete}
+              minimumTrackTintColor={'rgb(0, 168, 115)'}
+            />
+            <View style= {styles.timerContainer}>
+              <Text>
+                {this.state.timer}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -244,20 +299,18 @@ _decreaseIndex= ()=> {
 const styles= StyleSheet.create({
 
   container: {
-    borderColor: 'blue',
-    borderWidth: 1,
+    backgroundColor: 'silver',
+    borderColor: 'black',
+    borderWidth: 3,
     flexDirection: 'column',
   },
 
   header: {
-    borderColor: 'green',
-    borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   player: {
-    borderColor: 'red',
-    borderWidth: 1,
+    marginTop: '5%',
   },
 
   playerBtns: {
@@ -268,6 +321,10 @@ const styles= StyleSheet.create({
 
   producer: {
     fontWeight: 'bold',
+  },
+
+  timerContainer: {
+    alignItems: 'flex-end',
   },
 
   title: {
