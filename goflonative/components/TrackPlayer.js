@@ -41,7 +41,10 @@ class TrackPlayer extends Component {
   }
 
   componentWillUnmount() {
-    this.sound.stopAsync()
+    const { playingStatus }= this.state
+    if ( playingStatus !== 'nosound') {
+      this.sound.stopAsync()
+    }
     _isMounted= false
   }
 

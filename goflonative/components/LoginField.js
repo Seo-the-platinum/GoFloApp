@@ -10,6 +10,8 @@ import handleInitialData from '../actions/shared'
 import { setAuthedUser } from '../actions/authedUser'
 import { toggleStatus } from '../actions/users'
 import { useNavigation } from '@react-navigation/native'
+import { db } from '../actions/shared'
+
 
 
 class LoginField extends Component {

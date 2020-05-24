@@ -35,8 +35,6 @@ const styles= StyleSheet.create({
   },
   loginContainer: {
     alignItems: 'center',
-    borderColor: 'green',
-    borderWidth: 1,
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-end',

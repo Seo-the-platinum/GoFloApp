@@ -5,28 +5,78 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity } from 'react-native'
+import Expo from 'expo'
+
 
 class MediaSignUp extends Component {
+
+  loginFb= async ()=> {
+    await Expo.Facebook.logInWithReadPermissionsAsync(
+      id,
+      {permissions: ['public_profile', 'email', 'user_friends']}
+    )
+    if ( type === 'success') {
+
+      const response= await fetch()
+    } else {
+
+    }
+  }
+
+  loginTw= ()=> {
+    console.log('Twitter')
+  }
+
+  loginSc= ()=> {
+    console.log('Soundcloud')
+  }
+
+  createAccount= ()=> {
+
+  }
   render() {
     return (
       <View style={styles.container}>
-        <ImageBackground
-          source={require('../assets/btn_fb02.png')}
-          style={styles.backgroundImage}>
-            <TouchableOpacity></TouchableOpacity>
-        </ImageBackground>
-        <ImageBackground
-          source={require('../assets/btn_tw02.png')}
-          style={styles.backgroundImage}>
-        </ImageBackground>
-        <ImageBackground
-          source={require('../assets/btn_SC02.png')}
-          style={styles.backgroundImage}>
-        </ImageBackground>
-        <ImageBackground
-          source={require('../assets/btn_SU02.png')}
-          style={styles.backgroundImage}>
-        </ImageBackground>
+        <TouchableOpacity
+          onPress={this.loginFb}
+          style={{flex: 1}}
+          activeOpacity={.1}
+        >
+          <ImageBackground
+            source={require('../assets/btn_fb02.png')}
+            style={styles.backgroundImage}>
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.loginTw}
+          activeOpacity={.1}
+          style={{flex: 1}}
+        >
+          <ImageBackground
+            source={require('../assets/btn_tw02.png')}
+            style={styles.backgroundImage}>
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.loginSc}
+          activeOpacity={.1}
+          style={{flex: 1}}
+        >
+          <ImageBackground
+            source={require('../assets/btn_SC02.png')}
+            style={styles.backgroundImage}>
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.createAccount}
+          activeOpacity={.1}
+          style={{flex: 1}}
+        >
+          <ImageBackground
+            source={require('../assets/btn_SU02.png')}
+            style={styles.backgroundImage}>
+          </ImageBackground>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -34,8 +84,10 @@ class MediaSignUp extends Component {
 
 const styles= StyleSheet.create({
   container: {
-    borderColor: 'blue',
-    borderWidth: 1,
+    borderColor: 'white',
+    borderWidth: 3,
+    borderRadius: 10,
+    overflow: 'hidden',
     height: '35%',
     width: '100%',
     marginTop: 20,
@@ -43,6 +95,7 @@ const styles= StyleSheet.create({
   backgroundImage: {
     flex: 1,
     width: '100%',
+    overflow: 'hidden',
   }
 })
 export default MediaSignUp
