@@ -37,7 +37,6 @@ class Profile extends Component {
   render() {
     const { authedUser, users }= this.props
     const pic= users[authedUser].profilePic
-
     return (
       <View>
         <View style={styles.ProfileHeader}>
@@ -47,7 +46,7 @@ class Profile extends Component {
         </View>
         <View style={styles.ProfileTop}>
           <Image
-            source={pic}
+            source={require('../assets/newbieCloud.jpg')}
             style={{flex: 1}}/>
           <View style={styles.buttonsContainer}>
             <TouchableOpacity

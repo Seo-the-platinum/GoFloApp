@@ -7,7 +7,6 @@ import {
   TouchableOpacity } from 'react-native'
 import Expo from 'expo'
 
-
 class MediaSignUp extends Component {
 
   loginFb= async ()=> {
@@ -31,8 +30,8 @@ class MediaSignUp extends Component {
     console.log('Soundcloud')
   }
 
-  createAccount= ()=> {
-
+  linkToSignUp= ()=> {
+    this.props.navigation.navigate('SignUpPage')
   }
   render() {
     return (
@@ -68,7 +67,7 @@ class MediaSignUp extends Component {
           </ImageBackground>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={this.createAccount}
+          onPress={this.linkToSignUp}
           activeOpacity={.1}
           style={{flex: 1}}
         >

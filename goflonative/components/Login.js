@@ -19,7 +19,7 @@ class Login extends Component {
         >
         <View style={styles.loginContainer}>
           <LoginField />
-          <MediaSignUp/>
+          <MediaSignUp navigation={this.props.navigation}/>
         </View>
       </ImageBackground>
     )

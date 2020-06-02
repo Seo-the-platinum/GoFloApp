@@ -10,10 +10,9 @@ import handleInitialData from '../actions/shared'
 import { setAuthedUser } from '../actions/authedUser'
 import { toggleStatus } from '../actions/users'
 import { useNavigation } from '@react-navigation/native'
-import { db } from '../actions/shared'
+import { db } from '../utils/firebase'
 
-
-
+let usersRef= db.ref('/users')
 class LoginField extends Component {
   state={
     username: '',
@@ -23,9 +22,21 @@ class LoginField extends Component {
   }
 
   componentDidMount() {
+    usersRef.on('value', snapshot=> {
+      let data= snapshot.val()
+      console.log('hello data!', data)
+      this.props.dispatch(handleInitialData(data))
+    })
+  }
+/*
+  componentDidMount() {
+    usersRef.on('value', snapshot=> {
+      let data= snapshot.val()
+      console.log('here is our data:',data.wombraider.artistAbout)
+    })
     this.props.dispatch(handleInitialData())
   }
-
+*/
   handleUser= text => {
     this.setState(currState =>({
       currState,

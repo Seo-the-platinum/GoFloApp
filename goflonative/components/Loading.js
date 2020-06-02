@@ -3,7 +3,7 @@ import { Image, Text, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { connect } from 'react-redux'
-import Login from './Login'
+import LoginStack from './LoginStack'
 import Main from './Main'
 import ProfileStack from './ProfileStack'
 import Settings from './Settings'
@@ -77,7 +77,7 @@ class Loading extends Component {
     return (
       <Stack.Navigator headerMode={'none'}>
         { authedUser === null | undefined ? (
-          <Stack.Screen name='Login' component={Login}/>
+          <Stack.Screen name='Login' component={LoginStack}/>
         ):(
           <Stack.Screen name='Home' component={HomeTabs}/>
         )}
