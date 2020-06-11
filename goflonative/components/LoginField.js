@@ -10,7 +10,7 @@ import handleInitialData from '../actions/shared'
 import { setAuthedUser } from '../actions/authedUser'
 import { toggleStatus } from '../actions/users'
 import { useNavigation } from '@react-navigation/native'
-import { db } from '../utils/firebase'
+import { auth, db } from '../utils/firebase'
 
 let usersRef= db.ref('/users')
 class LoginField extends Component {
@@ -26,17 +26,10 @@ class LoginField extends Component {
       let data= snapshot.val()
       console.log('hello data!', data)
       this.props.dispatch(handleInitialData(data))
+
     })
   }
-/*
-  componentDidMount() {
-    usersRef.on('value', snapshot=> {
-      let data= snapshot.val()
-      console.log('here is our data:',data.wombraider.artistAbout)
-    })
-    this.props.dispatch(handleInitialData())
-  }
-*/
+
   handleUser= text => {
     this.setState(currState =>({
       currState,
@@ -76,6 +69,20 @@ class LoginField extends Component {
     }))
   }
 
+  signIn= ()=> {
+    const { username, password, redirect, match }= this.state
+    auth.signInWithEmailAndPassword(username, password)
+    .then(()=> {
+      this.setState(currState=> ({
+        currState,
+        match: true,
+        redirect: true,
+        username: '',
+        password: '',
+      }), ()=> console.log( match, redirect, auth.currentUser))
+    })
+    .catch((error)=> console.log(error.code, error.message))
+  }
   render() {
     const { username, password, match }=this.state
     return (
@@ -98,7 +105,7 @@ class LoginField extends Component {
         :null}
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={()=> {this.submit()
+          onPress={()=> {this.signIn()
            {this.state.redirect ? this.props.navigation.navigate('Loading')
            :null}}}
         >

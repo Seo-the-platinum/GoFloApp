@@ -36,7 +36,7 @@ class Profile extends Component {
 
   render() {
     const { authedUser, users }= this.props
-    const pic= users[authedUser].profilePic
+    //const pic= users[authedUser].profilePic
     return (
       <View>
         <View style={styles.ProfileHeader}>

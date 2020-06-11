@@ -11,7 +11,10 @@ import SignUpPage from './SignUpPage'
        headerMode={'none'}
        initialRouteName='Login'>
        <Stack.Screen name='Login' component={ Login }/>
-       <Stack.Screen name='SignUpPage' component={ SignUpPage }/>
+       <Stack.Screen
+         name='SignUpPage'
+         component={ SignUpPage }
+         />
      </Stack.Navigator>
    )
  }

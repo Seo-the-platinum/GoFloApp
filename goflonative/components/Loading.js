@@ -7,6 +7,7 @@ import LoginStack from './LoginStack'
 import Main from './Main'
 import ProfileStack from './ProfileStack'
 import Settings from './Settings'
+import { auth } from '../utils/firebase'
 
 const Stack= createStackNavigator();
 
@@ -72,11 +73,23 @@ function HomeTabs() {
   )
 }
 class Loading extends Component {
+  componentDidMount() {
+    auth.onAuthStateChanged((user)=> {
+      if (user) {
+        console.log('loading...', user)
+      } else {
+        console.log('no user found')
+      }
+    })
+  }
+
   render() {
     const{ authedUser }= this.props
+    const currentUser= auth.currentUser
+    console.log(currentUser !== null | undefined)
     return (
       <Stack.Navigator headerMode={'none'}>
-        { authedUser === null | undefined ? (
+        { currentUser === null | undefined ? (
           <Stack.Screen name='Login' component={LoginStack}/>
         ):(
           <Stack.Screen name='Home' component={HomeTabs}/>
