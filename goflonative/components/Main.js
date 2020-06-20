@@ -10,18 +10,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Spit from './Spit'
 import Settings from './Settings'
 import Profile from './Profile'
-import { auth } from '../utils/firebase'
+import { auth, db } from '../utils/firebase'
+import { connect } from 'react-redux'
+import { setAuthedUser } from '../actions/authedUser'
 
 class Main extends Component {
 
   signOut=()=> {
-    console.log('pressed!')
+    const { dispatch }= this.props
     auth.signOut().then(()=> {
-    console.log('sign out!')
+    this.props.dispatch(setAuthedUser(null))
 }).catch(function(error) {
   console.log('someting wong')
 });
-  }
+}
   render() {
     return (
       <ImageBackground
@@ -29,7 +31,7 @@ class Main extends Component {
         source={require('../assets/MainScreen_ttable.png')}
         style={styles.backgroundImage}
       >
-        <TouchableOpacity onPress={this.signOut()}>
+        <TouchableOpacity onPress={this.signOut}>
           <Text style={{color: 'white'}}> sign out</Text>
         </TouchableOpacity>
         <Image
@@ -49,4 +51,5 @@ const styles= StyleSheet.create({
     width: '100%',
   }
 })
-export default Main
+
+export default connect()(Main)

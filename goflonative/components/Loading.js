@@ -85,11 +85,9 @@ class Loading extends Component {
 
   render() {
     const{ authedUser }= this.props
-    const currentUser= auth.currentUser
-    console.log(currentUser !== null | undefined)
     return (
       <Stack.Navigator headerMode={'none'}>
-        { currentUser === null | undefined ? (
+        { authedUser === null | undefined ? (
           <Stack.Screen name='Login' component={LoginStack}/>
         ):(
           <Stack.Screen name='Home' component={HomeTabs}/>
