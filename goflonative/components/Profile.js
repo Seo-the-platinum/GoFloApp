@@ -11,6 +11,7 @@ import FriendsList from './FriendsList'
 import { Audio } from 'expo-av'
 import { createStackNavigator } from '@react-navigation/stack'
 import ArtistPage from './ArtistPage'
+import { auth } from '../utils/firebase'
 
 class Profile extends Component {
 
@@ -37,12 +38,13 @@ class Profile extends Component {
   render() {
     const { authedUser, users }= this.props
     //const pic= users[authedUser].profilePic
+    const {displayName}= auth.currentUser
     return (
       <View>
         <View style={styles.ProfileHeader}>
           <Text
             style={styles.ProfileHeaderText}
-            > { authedUser }</Text>
+            > { displayName }</Text>
         </View>
         <View style={styles.ProfileTop}>
           <Image

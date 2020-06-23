@@ -7,8 +7,11 @@ import {
 import { connect } from 'react-redux'
 import Track from './Track'
 import TrackPlayer from './TrackPlayer'
+import { fireStore } from '../utils/firebase'
+
 
 class Tracks extends Component {
+
   render() {
     const { authedUser, users }= this.props
     const tracks= Object.keys(users[authedUser].tracks)

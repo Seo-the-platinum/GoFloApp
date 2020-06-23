@@ -73,7 +73,10 @@ class LoginField extends Component {
     const { dispatch }= this.props
     auth.signInWithEmailAndPassword(username, password)
     .then(()=> { dispatch(setAuthedUser(auth.currentUser.uid))
+      db.ref().child('/users/' + auth.currentUser.uid ).update({
+        online: true,
       })
+    })
     .catch((error)=> console.log(error.code, error.message))
 
   }

@@ -5,8 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   View } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
-import { Entypo } from '@expo/vector-icons'
+import { AntDesign, Entypo, MaterialIcons } from '@expo/vector-icons'
 import { auth } from '../utils/firebase'
 
 class SignUpPage extends Component {
@@ -14,6 +13,7 @@ class SignUpPage extends Component {
     email:'',
     password:'',
     confirmPassword:'',
+    userName:'',
   }
 
   handleUser=(text)=> {
@@ -37,11 +37,20 @@ class SignUpPage extends Component {
     }))
   }
 
+  handleUserName=(text)=> {
+    const { userName }= this.state
+    this.setState(currState=> ({
+      currState,
+      userName: text,
+    }))
+  }
+
   signUp= ()=> {
-    const { email, password, confirmPassword }= this.state
+    const { email, password, confirmPassword, userName }= this.state
+    console.log(userName)
     if ( password === confirmPassword ) {
       auth.createUserWithEmailAndPassword(email, password)
-      .then(()=> console.log(auth.currentUser))
+      .then(()=> auth.currentUser.updateProfile({displayName: userName}))
       .catch(error=> {
         if(error.code === 'auth/email-already-exists') {
           console.log('That email is already in use!')
@@ -51,10 +60,11 @@ class SignUpPage extends Component {
         }
         console.log(error)
       })
+
     }
   }
   render() {
-    const { email, password, confirmPassword }= this.state
+    const { email, password, confirmPassword, userName }= this.state
 
     return (
       <View style={styles.container}>
@@ -78,6 +88,17 @@ class SignUpPage extends Component {
             <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
               <Entypo name='key' size={24} color='white'/>
               <Text style={{color: 'white', flex: 1, fontSize: 24}}> Password</Text>
+            </View>
+          </View>
+          <View style={styles.userNameArea}>
+            <TextInput
+              style={styles.userName}
+              value={userName}
+              onChangeText={(text)=> this.handleUserName(text)}
+            />
+            <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
+              <AntDesign name='user' size={24} color='white'/>
+              <Text style={{color: 'white', flex: 1, fontSize: 24}}> Username</Text>
             </View>
           </View>
           <View style={styles.confirmPasswordArea}>
@@ -159,6 +180,19 @@ const styles= StyleSheet.create({
   emailArea: {
     flex: 1,
   },
+
+  userName: {
+    borderColor: 'white',
+    borderRadius: 10,
+    borderWidth: 2,
+    color: 'white',
+    flex: 1,
+    fontSize: 18,
+  },
+
+  userNameArea: {
+    flex: 1,
+  }
 })
 
 export default SignUpPage

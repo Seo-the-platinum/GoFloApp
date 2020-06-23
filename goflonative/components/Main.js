@@ -18,11 +18,15 @@ class Main extends Component {
 
   signOut=()=> {
     const { dispatch }= this.props
+    db.ref().child('/users/' + auth.currentUser.uid ).update({
+      online: false,
+    }).then(()=> {
     auth.signOut().then(()=> {
     this.props.dispatch(setAuthedUser(null))
-}).catch(function(error) {
-  console.log('someting wong')
-});
+    }).catch(function(error) {
+    console.log('someting wong')
+    });
+  })
 }
   render() {
     return (

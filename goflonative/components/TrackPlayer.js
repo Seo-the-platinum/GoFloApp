@@ -9,9 +9,9 @@ import { connect } from 'react-redux'
 import { Audio } from 'expo-av'
 import { Slider } from 'react-native'
 import { AntDesign, Fontisto } from '@expo/vector-icons'
+import { storageRef } from '../utils/firebase'
 
 let _isMounted= false
-
 class TrackPlayer extends Component {
 
   state={
@@ -22,21 +22,12 @@ class TrackPlayer extends Component {
     totalMillis: null,
     timer: null,
   }
-  componentDidMount() {
+
+
+  async componentDidMount() {
     _isMounted= true
-    const { users, authedUser, tracks }= this.props
-    const trackList= tracks.map(s=> {
-        return {
-          title: users[authedUser].tracks[s].title,
-          source: users[authedUser].tracks[s].source,
-          producer: users[authedUser].tracks[s].producer,
-        }
-      })
-    if (_isMounted) {
-      this.setState(currState=> ({
-        ...currState,
-        playList: trackList,
-      }))
+    if( _isMounted= true) {
+    await this._buildSongsObj()
     }
   }
 
@@ -46,6 +37,26 @@ class TrackPlayer extends Component {
       this.sound.stopAsync()
     }
     _isMounted= false
+  }
+
+   _buildSongsObj= async ()=> {
+     const { authedUser, users, tracks, }= this.props
+       const promises= tracks.map(s=> {
+       const fireSource= storageRef.child(users[authedUser].tracks[s].source)
+       return fireSource.getDownloadURL().then((url)=> {
+         return {
+           producer: users[authedUser].tracks[s].producer,
+           source: url,
+           title: users[authedUser].tracks[s].title,
+         }
+      })
+   })
+    await Promise.all(promises).then((res)=> {
+       this.setState(currState=> ({
+         ...currState,
+         playList: res,
+       }), ()=> console.log('playList here',this.state.playList))
+     })
   }
 
   _playAndPause= ()=> {
@@ -64,6 +75,9 @@ class TrackPlayer extends Component {
 
   _playRecording = async ()=> {
     const { index, playList }= this.state
+    console.log('heres our playList in play method', playList)
+    console.log('heres our source', playList[index].source)
+    const source= {uri: playList[index].source}
     /* sound is declared, contains the audio.sound object
     when _playRecording is called, it is paused by the await
     tag. once the audio.sound.createAsync is finished,
@@ -71,7 +85,7 @@ class TrackPlayer extends Component {
     const { sound }= await Audio.Sound.createAsync(
       /*we pass createAsync an audio source and an object
       to set the initialStatus prop of audio.sound*/
-      playList[index].source,
+      source,
       {
         shouldPlay: true,
         isLooping: false,
@@ -263,12 +277,12 @@ class TrackPlayer extends Component {
             <TouchableOpacity
               onPress={this._playAndPause}>
               { playingStatus === 'playing' ?
-              <Fontisto
+              <AntDesign
                 name='pause'
                 size={24}
                 color='black'/>
               :
-              <Fontisto
+              <AntDesign
                 name='play'
                 size={24}
                 color='black'/>}
