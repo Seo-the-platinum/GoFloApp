@@ -11,9 +11,44 @@ import FriendsList from './FriendsList'
 import { Audio } from 'expo-av'
 import { createStackNavigator } from '@react-navigation/stack'
 import ArtistPage from './ArtistPage'
-import { auth } from '../utils/firebase'
+import { auth, storageRef } from '../utils/firebase'
 
 class Profile extends Component {
+  state= {
+    imgUri: null,
+    loading: true,
+  }
+
+  async componentDidMount() {
+    const { authedUser, users }= this.props
+    if ( users[authedUser].profilePic !== undefined ) {
+      await this.getUri()
+    } else {
+      await this.getDefaultUri()
+    }
+  }
+
+  getUri= ()=> {
+    const { authedUser, users }= this.props
+    const fireSource= storageRef.child(users[authedUser].profilePic)
+    return fireSource.getDownloadURL().then((url)=> {
+      this.setState(currState=> ({
+        imgUri: url,
+        loading: false,
+      }), ()=> console.log('users img', url))
+    })
+  }
+
+  getDefaultUri= ()=> {
+    const { authedUser, users }= this.props
+    const fireSource= storageRef.child('images/defaultUserpic.jpg')
+    return fireSource.getDownloadURL().then((url)=> {
+      this.setState(currState=> ({
+        imgUri: url,
+        loading: false,
+      }))
+    })
+  }
 
   linkToArtist=()=> {
     this.props.navigation.navigate('ArtistPage')
@@ -35,10 +70,14 @@ class Profile extends Component {
     this.props.navigation.navigate('Messages')
   }
 
+
   render() {
     const { authedUser, users }= this.props
-    //const pic= users[authedUser].profilePic
-    const {displayName}= auth.currentUser
+    const { imgUri, loading }= this.state
+    const { displayName }= auth.currentUser
+    console.log('render method', imgUri)
+    if ( loading === false ) {
+      console.log('if statement', imgUri)
     return (
       <View>
         <View style={styles.ProfileHeader}>
@@ -48,9 +87,9 @@ class Profile extends Component {
         </View>
         <View style={styles.ProfileTop}>
           <Image
-            source={require('../assets/newbieCloud.jpg')}
-            style={{flex: 1}}/>
-          <View style={styles.buttonsContainer}>
+            source={{uri:imgUri}}
+            style={{width: 200, height: 200}}/>
+        <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={styles.buttonContainer}
               onPress={this.linkToArtist}>
@@ -167,7 +206,7 @@ class Profile extends Component {
           />
         </View>
       </View>
-    )
+    )} else { return (null)}
   }
 }
 

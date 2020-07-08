@@ -17,6 +17,7 @@
     "expo-av": "^8.0.0",
     "expo-cli": "^3.21.3",
     "expo-facebook": "~8.0.0",
+    "expo-image-picker": "~8.0.1",
     "expo-updates": "~0.0.1-rc.0",
     "firebase": "^7.14.5",
     "react": "~16.9.0",

@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
-import { Text, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View } from 'react-native'
+import { connect } from 'react-redux'
 
 class Settings extends Component {
   render() {
@@ -11,4 +16,10 @@ class Settings extends Component {
   }
 }
 
-export default Settings
+function mapStateToProps({ authedUser, users }) {
+  return {
+    authedUser,
+    users,
+  }
+}
+export default connect(mapStateToProps)(Settings)

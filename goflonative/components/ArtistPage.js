@@ -11,7 +11,6 @@ import { connect } from 'react-redux'
 class ArtistPage extends Component {
   render() {
     const { authedUser, users }= this.props
-    console.log(`here is the artist data ${users[authedUser].artistName}`)
     return (
       <View style={styles.container}>
         <View style={styles.headerView}>
