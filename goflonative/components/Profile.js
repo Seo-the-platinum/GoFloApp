@@ -12,6 +12,7 @@ import { Audio } from 'expo-av'
 import { createStackNavigator } from '@react-navigation/stack'
 import ArtistPage from './ArtistPage'
 import { auth, storageRef } from '../utils/firebase'
+import UpdatedImage from './UpdatedImage'
 
 class Profile extends Component {
   state= {
@@ -21,6 +22,7 @@ class Profile extends Component {
 
   async componentDidMount() {
     const { authedUser, users }= this.props
+    console.log('profile component mounted!', this.props.navigation)
     if ( users[authedUser].profilePic !== undefined ) {
       await this.getUri()
     } else {
@@ -30,7 +32,7 @@ class Profile extends Component {
 
   getUri= ()=> {
     const { authedUser, users }= this.props
-    const fireSource= storageRef.child(users[authedUser].profilePic)
+    const fireSource= storageRef.child(`images/${users[authedUser].profilePic.imgName}`)
     return fireSource.getDownloadURL().then((url)=> {
       this.setState(currState=> ({
         imgUri: url,
@@ -75,20 +77,11 @@ class Profile extends Component {
     const { authedUser, users }= this.props
     const { imgUri, loading }= this.state
     const { displayName }= auth.currentUser
-    console.log('render method', imgUri)
     if ( loading === false ) {
-      console.log('if statement', imgUri)
     return (
       <View>
-        <View style={styles.ProfileHeader}>
-          <Text
-            style={styles.ProfileHeaderText}
-            > { displayName }</Text>
-        </View>
         <View style={styles.ProfileTop}>
-          <Image
-            source={{uri:imgUri}}
-            style={{width: 200, height: 200}}/>
+          <UpdatedImage/>
         <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={styles.buttonContainer}
@@ -251,7 +244,7 @@ const styles= StyleSheet.create({
 
 })
 
-function mapStateToProps({ authedUser, users}) {
+function mapStateToProps({ authedUser, users,}) {
   return {
     authedUser,
     users,

@@ -10,6 +10,8 @@ import { connect } from 'react-redux'
 import * as ImagePicker from 'expo-image-picker'
 import Constants from 'expo-constants'
 import { auth, db, storageRef } from '../utils/firebase'
+import Profile from './Profile'
+import { updateProfilePic } from '../actions/users'
 
 class Customize extends Component {
 
@@ -29,6 +31,7 @@ class Customize extends Component {
       }
     }
     if ( users[authedUser].profilePic !== undefined ) {
+      console.log('Customize mounted here!', users[authedUser].profilePic)
       await this.getUri()
     } else {
       await this.getDefaultUri()
@@ -37,7 +40,7 @@ class Customize extends Component {
 
   getUri= ()=> {
     const { authedUser, users }= this.props
-    const fireSource= storageRef.child(users[authedUser].profilePic)
+    const fireSource= storageRef.child(`images/${users[authedUser].profilePic.imgName}`)
     return fireSource.getDownloadURL().then((url)=> {
       this.setState(currState=> ({
         imgUri: url,
@@ -64,7 +67,7 @@ class Customize extends Component {
       aspect: [4,3],
       quality: 1,
     })
-
+    console.log('here i go again', result.uri.split('/').pop())
     this.setState(currState=> ({
       currState,
       imgUri: result.uri,
@@ -86,23 +89,36 @@ class Customize extends Component {
   }
 
   saveSettings= async ()=> {
-    const { artist, display, imgUri }= this.state
-    const { authedUser }= this.props
-    const imgName= `${authedUser}-profile-img`
+    const { artist, imgUri }= this.state
+    const { authedUser, users }= this.props
+    const imgName= `${imgUri.split('/').pop()}`
     const request= await fetch(imgUri)
     const blob= await request.blob()
     const locRef= storageRef.child(`images/${imgName}`)
-    return locRef.put(blob)
+     if (users[authedUser].profilePic !== undefined) {
+      const oldImgName= users[authedUser].profilePic.imgName
+      const delRef= storageRef.child(`images/${oldImgName}`)
+      await delRef.delete().then(()=> locRef.put(blob))
+    } else {
+      await locRef.put(blob)
+    }
+    this.setProfilePic(imgName)
+
   }
+
+  setProfilePic= async (imgName)=> {
+    const { authedUser, users, dispatch }= this.props
+
+     await db.ref(`users/${authedUser}/profilePic`).update({
+     imgName,
+   }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
+   }
 
   render() {
     const { imgUri, loading, display, artist }= this.state
     if ( loading === false ) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={{fontSize: 36,}}> Customize </Text>
-        </View>
         <View style={styles.imageButtonContainer}>
         <Image
           source={{uri:imgUri}}
@@ -170,7 +186,6 @@ styles= StyleSheet.create({
   container: {
     backgroundColor: 'gray',
     flex: 1,
-    paddingTop: '10%',
     justifyContent: 'flex-start',
   },
 
