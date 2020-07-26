@@ -83,14 +83,10 @@ const styles= StyleSheet.create({
     width: '100%',
   },
   offlineView: {
-    borderLeftColor: 'white',
-    borderLeftWidth: 3,
     alignItems: 'center',
     width: '90%',
   },
   onlineView: {
-    borderLeftColor: 'white',
-    borderLeftWidth: 3,
     alignItems: 'center',
     width: '90%',
   },

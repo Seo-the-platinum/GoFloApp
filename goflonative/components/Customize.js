@@ -31,7 +31,6 @@ class Customize extends Component {
       }
     }
     if ( users[authedUser].profilePic !== undefined ) {
-      console.log('Customize mounted here!', users[authedUser].profilePic)
       await this.getUri()
     } else {
       await this.getDefaultUri()
@@ -67,7 +66,7 @@ class Customize extends Component {
       aspect: [4,3],
       quality: 1,
     })
-    console.log('here i go again', result.uri.split('/').pop())
+
     this.setState(currState=> ({
       currState,
       imgUri: result.uri,
@@ -89,7 +88,7 @@ class Customize extends Component {
   }
 
   saveSettings= async ()=> {
-    const { artist, imgUri }= this.state
+    const { artist, display, imgUri }= this.state
     const { authedUser, users }= this.props
     const imgName= `${imgUri.split('/').pop()}`
     const request= await fetch(imgUri)
@@ -103,16 +102,25 @@ class Customize extends Component {
       await locRef.put(blob)
     }
     this.setProfilePic(imgName)
-
+    this.setDisplayName(display)
   }
 
   setProfilePic= async (imgName)=> {
-    const { authedUser, users, dispatch }= this.props
+    const { authedUser, dispatch, users }= this.props
 
      await db.ref(`users/${authedUser}/profilePic`).update({
      imgName,
-   }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
+     }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
    }
+
+  setDisplayName= async (display)=> {
+    const { authedUser, dispatch, users }= this.props
+    const user= auth.currentUser
+    await user.updateProfile({
+      displayName: display,
+    }).then(()=> console.log(`display name has been update to ${display}`))
+    .catch((error)=> console.log(error))
+  }
 
   render() {
     const { imgUri, loading, display, artist }= this.state
@@ -133,7 +141,7 @@ class Customize extends Component {
         <View style={styles.displayNameContainer}>
           <TextInput
             maxLength={20}
-            onChangeText={(text)=>his.handleDisplayName(text)}
+            onChangeText={(text)=>this.handleDisplayName(text)}
             placeholder='Enter Display Name'
             placeholderTextColor= 'white'
             value={display}

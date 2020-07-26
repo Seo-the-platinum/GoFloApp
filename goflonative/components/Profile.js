@@ -22,7 +22,6 @@ class Profile extends Component {
 
   async componentDidMount() {
     const { authedUser, users }= this.props
-    console.log('profile component mounted!', this.props.navigation)
     if ( users[authedUser].profilePic !== undefined ) {
       await this.getUri()
     } else {
@@ -37,7 +36,7 @@ class Profile extends Component {
       this.setState(currState=> ({
         imgUri: url,
         loading: false,
-      }), ()=> console.log('users img', url))
+      }))
     })
   }
 

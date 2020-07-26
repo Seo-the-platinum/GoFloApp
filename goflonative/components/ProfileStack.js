@@ -7,6 +7,7 @@ import Tracks from './Tracks'
 import Messages from './Messages'
 import Leaderboards from './Leaderboards'
 import Customize from './Customize'
+import { auth } from '../utils/firebase'
 
 const Stack= createStackNavigator();
 
@@ -22,10 +23,10 @@ export default function ProfileStack(){
             color: 'white',
           }
         }}
-        initialRouteName='Profile'>
+        initialRouteName={auth.currentUser.displayName}>
         <Stack.Screen name='ArtistPage' component={ArtistPage}/>
         <Stack.Screen
-          name='Profile'
+          name={auth.currentUser.displayName}
           component={Profile}
         />
         <Stack.Screen name='Tracks' component={Tracks}/>

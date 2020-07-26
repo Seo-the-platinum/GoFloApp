@@ -11,7 +11,6 @@ const UpdatedImage= (props)=> {
     useFocusEffect(
       React.useCallback(()=> {
         let isActive= true
-
         const updateUrl= async ()=> {
           const fireSource= storageRef.child(`images/${users[authedUser].profilePic.imgName}`)
           return await fireSource.getDownloadURL().then((url)=> {
@@ -20,7 +19,9 @@ const UpdatedImage= (props)=> {
             }
           })
         }
-         updateUrl()
+
+        updateUrl()
+
         return ()=> isActive= false
       })
     )
