@@ -7,17 +7,38 @@ import {
   Text,
   View } from 'react-native'
 import { connect } from 'react-redux'
+import { storageRef } from '../utils/firebase'
 
 class ArtistPage extends Component {
+
+  state= {
+    loading: true,
+    imgUri: '',
+  }
+  async componentDidMount() {
+    const { authedUser, users }= this.props
+    await this.getArtistUri()
+  }
+
+  getArtistUri= ()=> {
+    const { authedUser, users }= this.props
+    const fireSource= storageRef.child(`images/${users[authedUser].profilePic.imgName}`)
+    return fireSource.getDownloadURL().then((url)=> {
+      this.setState(currState=> ({
+        imgUri: url,
+        loading: false,
+      }))
+    })
+  }
+
   render() {
     const { authedUser, users }= this.props
+    const { imgUri, loading }= this.state
+    if (loading === true) {
+      return null
+    } else {
     return (
       <View style={styles.container}>
-        <View style={styles.headerView}>
-          <Text style={{
-            color: 'white',
-            fontSize: 36,}}> Artist Page</Text>
-        </View>
         <View style={styles.artistHeader}>
           <View style={styles.artistTitle}>
             <ImageBackground
@@ -32,7 +53,7 @@ class ArtistPage extends Component {
                 style={{
                   color: 'white',
                   fontSize: 24,}}
-              >{ users[authedUser].artistName }
+              >{ users[authedUser].artistName}
               </Text>
             </ImageBackground>
           </View>
@@ -41,7 +62,7 @@ class ArtistPage extends Component {
               style={{
                 width:'100%',
                 height:'100%',}}
-              source={require('../assets/pleasurables.jpg')}
+              source={{uri:imgUri}}
             />
           </View>
         </View>
@@ -83,6 +104,7 @@ class ArtistPage extends Component {
       </View>
     )
   }
+ }
 }
 
 const styles= StyleSheet.create({

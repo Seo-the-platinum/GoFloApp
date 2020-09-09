@@ -18,6 +18,10 @@ function HomeTabs() {
     <Tab.Navigator
       tabBarOptions= {{
         showLabel: false,
+        style: {
+          height: '7%',
+          paddingBottom: 0,
+        }
       }}
     >
       <Tab.Screen

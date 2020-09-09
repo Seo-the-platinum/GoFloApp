@@ -1,5 +1,8 @@
 {
   "expo": {
+    "facebookScheme": "fb251209479296772",
+    "facebookAppId": "251209479296772",
+    "facebookDisplayName": "goFloTest",
     "name": "glofloapp",
     "slug": "GoFloNative",
     "privacy": "public",
@@ -24,7 +27,7 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
-    }
+      "supportsTablet": true,
+    },
   }
 }

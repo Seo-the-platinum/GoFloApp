@@ -18,8 +18,8 @@ import { Audio } from 'expo-av'
 
      return (
        <View style={styles.container}>
-         <View style={{flex: 1}}>
-           <Text>
+         <View style={{flex: 2}}>
+           <Text style={styles.title}>
              {title}
            </Text>
          </View>
@@ -42,7 +42,7 @@ const styles= StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 5,
+    margin: 5,
   },
   buttonImage: {
     height: 50,
@@ -52,7 +52,9 @@ const styles= StyleSheet.create({
     flex: .5,
     marginRight: '5%',
   },
-
+  title: {
+    fontSize: 18,
+  },
 })
 function mapStateToProps({users, authedUser}) {
   return {

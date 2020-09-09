@@ -6,24 +6,48 @@ import {
   ImageBackground,
   TouchableOpacity } from 'react-native'
 import Expo from 'expo'
+import { db, auth } from '../utils/firebase'
+import * as Facebook from 'expo-facebook'
+import * as Google from 'expo-google-app-auth'
+import firebase from 'firebase'
+import { setAuthedUser } from '../actions/authedUser'
 
 class MediaSignUp extends Component {
 
+  componentDidMount() {
+  firebase.auth().onAuthStateChanged(user => {
+    if (user != null) {
+        console.log(user);
+    }
+  });
+}
+
   loginFb= async ()=> {
-    await Expo.Facebook.logInWithReadPermissionsAsync(
-      id,
-      {permissions: ['public_profile', 'email', 'user_friends']}
+    await Facebook.initializeAsync('251209479296772')
+
+    const { type, token }= await Facebook.logInWithReadPermissionsAsync(
+    { permissions: ['public_profile','email'] }
     )
-    if ( type === 'success') {
+    if (type === 'success') {
+      console.log('heres our token from fb!!',token)
+      const credential= firebase.auth.FacebookAuthProvider.credential(token)
 
-      const response= await fetch()
-    } else {
-
+      firebase.auth().signInWithCredential(credential)
+      .then(()=> { console.log(firebase.auth().currentUser.uid)
+      this.addUserToDb(firebase.auth().currentUser.uid)})
+      .catch(error=> console.log(error))
     }
   }
 
-  loginTw= ()=> {
-    console.log('Twitter')
+  loginTw= async ()=> {
+    const provider= new firebase.auth.TwitterAuthProvider()
+    await firebase.auth().signInWithPopup(provider)
+    .then((result)=> {
+        const token= result.credential.accessToken
+        const secret= result.credential.secret
+        const user= result.user
+      })
+      .catch((error)=> console.log(error))
   }
 
   loginSc= ()=> {
@@ -33,6 +57,23 @@ class MediaSignUp extends Component {
   linkToSignUp= ()=> {
     this.props.navigation.navigate('SignUpPage')
   }
+
+  addUserToDb= async (userId)=> {
+    const { dispatch }= this.props
+    if (db.ref('users/' + userId) === undefined ) {
+    await db.ref('users/' + userId).set({
+      artistAbout: 'Tell us about you...',
+      artistName: 'Artist or Group name here...',
+      favoriteArtist: ['Artist1', 'Artist2', 'Artist3'],
+      online: true,
+      profilePic: {
+        imgName: 'defaultUserpic.jpg',
+      },
+      tracks: null,
+    })}
+    dispatch(setAuthedUser(userId))
+  }
+
   render() {
     return (
       <View style={styles.container}>

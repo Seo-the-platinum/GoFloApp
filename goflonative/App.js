@@ -11,8 +11,6 @@ import reducer from './reducers/index'
 import middleware from './middleware/index'
 import { connect } from 'react-redux'
 
-
-
 class App extends Component {
 
   render() {

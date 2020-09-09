@@ -43,31 +43,6 @@ class LoginField extends Component {
     }))
   }
 
-  submit= ()=> {
-    const { users, dispatch }= this.props
-    const { username, password, match }= this.state
-    const usersArray= Object.keys(users)
-    const pwArray= usersArray.map(u=> users[u].password)
-
-    usersArray.indexOf(username) !== -1 && pwArray.indexOf(password) !==-1 ?
-    this.setState(currState=> ({
-      currState,
-      match: true,
-      username: '',
-      password: '',
-      redirect: true,
-    }), ()=> {dispatch(setAuthedUser(username))
-              dispatch(toggleStatus(username))}
-      )
-    :
-    this.setState(currState=> ({
-      currState,
-      match: false,
-      username: '',
-      password: '',
-    }))
-  }
-
   signIn= ()=> {
     const { username, password, redirect, match }= this.state
     const { dispatch }= this.props

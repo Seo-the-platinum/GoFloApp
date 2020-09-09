@@ -56,7 +56,7 @@ class Profile extends Component {
   }
 
   linkToTracks=()=> {
-    this.props.navigation.navigate('Tracks')
+    this.props.navigation.navigate('The Vault')
   }
 
   linkToLeaderboards=()=> {
@@ -76,7 +76,7 @@ class Profile extends Component {
     const { authedUser, users }= this.props
     const { imgUri, loading }= this.state
     const { displayName }= auth.currentUser
-    if ( loading === false ) {
+    if ( loading === false && authedUser !== null ) {
     return (
       <View>
         <View style={styles.ProfileTop}>

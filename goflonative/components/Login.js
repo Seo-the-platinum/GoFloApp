@@ -19,7 +19,9 @@ class Login extends Component {
         >
         <View style={styles.loginContainer}>
           <LoginField />
-          <MediaSignUp navigation={this.props.navigation}/>
+          <MediaSignUp
+            dispatch={this.props.dispatch}
+            navigation={this.props.navigation}/>
         </View>
       </ImageBackground>
     )
@@ -43,4 +45,4 @@ const styles= StyleSheet.create({
 })
 
 
-export default Login
+export default connect()(Login)

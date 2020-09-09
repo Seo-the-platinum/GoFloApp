@@ -13,6 +13,7 @@ import Profile from './Profile'
 import { auth, db } from '../utils/firebase'
 import { connect } from 'react-redux'
 import { setAuthedUser } from '../actions/authedUser'
+import Login from './Login'
 
 class Main extends Component {
 
@@ -23,6 +24,7 @@ class Main extends Component {
     }).then(()=> {
     auth.signOut().then(()=> {
     this.props.dispatch(setAuthedUser(null))
+    this.navigation.navigate('Login')
     }).catch(function(error) {
     console.log('someting wong')
     });
@@ -50,7 +52,6 @@ const styles= StyleSheet.create({
   backgroundImage: {
     alignItems: 'center',
     flex: 1,
-    height: '90%',
     justifyContent: 'flex-end',
     width: '100%',
   }

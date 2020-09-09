@@ -19,9 +19,7 @@ const UpdatedImage= (props)=> {
             }
           })
         }
-
         updateUrl()
-
         return ()=> isActive= false
       })
     )

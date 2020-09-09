@@ -17,9 +17,6 @@ class Tracks extends Component {
     const tracks= Object.keys(users[authedUser].tracks)
     return (
       <View>
-        <View style={styles.headerView}>
-          <Text style={styles.headerText}> THE VAULT </Text>
-        </View>
         <View style={styles.credits}>
           <ImageBackground
             style={styles.creditsBackground}

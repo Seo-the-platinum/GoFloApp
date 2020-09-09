@@ -12,6 +12,13 @@ import { auth } from '../utils/firebase'
 const Stack= createStackNavigator();
 
 export default function ProfileStack(){
+  const routeName= ()=> {
+    if (auth.currentUser.displayName) {
+      return auth.currentUser.displayName
+    } else {
+      return 'Hello, user!'
+    }
+  }
     return (
       <Stack.Navigator
         headerMode={'float'}
@@ -23,13 +30,13 @@ export default function ProfileStack(){
             color: 'white',
           }
         }}
-        initialRouteName={auth.currentUser.displayName}>
+        initialRouteName='profile'>
         <Stack.Screen name='ArtistPage' component={ArtistPage}/>
         <Stack.Screen
-          name={auth.currentUser.displayName}
+          name='profile'
           component={Profile}
         />
-        <Stack.Screen name='Tracks' component={Tracks}/>
+        <Stack.Screen name='The Vault' component={Tracks}/>
         <Stack.Screen
           name='Customize'
           component={Customize}
