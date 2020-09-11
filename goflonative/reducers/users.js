@@ -1,4 +1,8 @@
-import { RECEIVE_USERS, TOGGLE_STATUS, UPDATE_URL } from '../actions/users';
+import {
+  RECEIVE_USERS,
+  TOGGLE_STATUS,
+  UPDATE_URL,
+  UPDATE_ARTIST } from '../actions/users';
 
 export default function users(state={}, action) {
   switch(action.type) {
@@ -27,6 +31,15 @@ export default function users(state={}, action) {
             ...state[authedUser].profilePic,
             imgName: imgName,
           }
+        }
+      }
+    case UPDATE_ARTIST:
+      const { artist }= action
+      return {
+        ...state,
+        [action.authedUser]: {
+          ...state[action.authedUser],
+          artistName: artist,
         }
       }
     default:

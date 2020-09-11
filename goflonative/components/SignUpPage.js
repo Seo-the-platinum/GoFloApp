@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   View } from 'react-native'
 import { AntDesign, Entypo, MaterialIcons } from '@expo/vector-icons'
-import { auth } from '../utils/firebase'
+import { auth, db } from '../utils/firebase'
+import { connect } from 'react-redux'
+import { setAuthedUser } from '../actions/authedUser'
 
 class SignUpPage extends Component {
   state={
@@ -51,6 +53,7 @@ class SignUpPage extends Component {
     if ( password === confirmPassword ) {
       auth.createUserWithEmailAndPassword(email, password)
       .then(()=> auth.currentUser.updateProfile({displayName: userName}))
+      .then(()=> this.addUserToDb(auth.currentUser.uid))
       .catch(error=> {
         if(error.code === 'auth/email-already-exists') {
           console.log('That email is already in use!')
@@ -60,8 +63,29 @@ class SignUpPage extends Component {
         }
         console.log(error)
       })
-
     }
+  }
+
+  addUserToDb= async (userId)=> {
+    const { dispatch }= this.props
+    console.log('here is the UID', userId)
+    await db.ref('users/' + userId).set({
+      artistAbout: 'Tell us about you...',
+      artistName: 'Artist or Group name here...',
+      favoriteArtist: ['Artist1', 'Artist2', 'Artist3'],
+      online: false,
+      profilePic: {
+        imgName: 'defaultUserpic.jpg',
+      },
+      tracks: {
+        sampleTrack: {
+          genre: 'hip hop',
+          producer: 'Ben Paul',
+          source: 'sounds/Minx.mp3',
+          title: 'Minx',
+        },
+      },
+    })
   }
   render() {
     const { email, password, confirmPassword, userName }= this.state
@@ -195,4 +219,4 @@ const styles= StyleSheet.create({
   }
 })
 
-export default SignUpPage
+export default connect()(SignUpPage)

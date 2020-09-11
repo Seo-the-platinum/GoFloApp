@@ -11,7 +11,7 @@ import * as ImagePicker from 'expo-image-picker'
 import Constants from 'expo-constants'
 import { auth, db, storageRef } from '../utils/firebase'
 import Profile from './Profile'
-import { updateProfilePic } from '../actions/users'
+import { updateProfilePic, updateArtist } from '../actions/users'
 
 class Customize extends Component {
 
@@ -97,12 +97,17 @@ class Customize extends Component {
      if (users[authedUser].profilePic !== undefined) {
       const oldImgName= users[authedUser].profilePic.imgName
       const delRef= storageRef.child(`images/${oldImgName}`)
+      if (oldImgName !== 'defaultUserpic.jpg') {
       await delRef.delete().then(()=> locRef.put(blob))
+      } else {
+        await locRef.put(blob)
+      }
     } else {
       await locRef.put(blob)
     }
     this.setProfilePic(imgName)
     this.setDisplayName(display)
+    this.setArtistName(artist)
   }
 
   setProfilePic= async (imgName)=> {
@@ -119,7 +124,14 @@ class Customize extends Component {
     await user.updateProfile({
       displayName: display,
     }).then(()=> console.log(`display name has been update to ${display}`))
-    .catch((error)=> console.log(error))
+    .catch((error)=> console.log('setDisplayName error:',error))
+  }
+
+  setArtistName= async (artist)=> {
+    const { authedUser, dispatch, users }= this.props
+    await db.ref(`users/${authedUser}`).update({
+      artistName: artist,
+    }, ()=> dispatch(updateArtist(authedUser, artist)))
   }
 
   render() {

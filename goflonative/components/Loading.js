@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Image, Text, View } from 'react-native'
+import { Button, Image, Text, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { connect } from 'react-redux'
@@ -7,13 +7,15 @@ import LoginStack from './LoginStack'
 import Main from './Main'
 import ProfileStack from './ProfileStack'
 import Settings from './Settings'
-import { auth } from '../utils/firebase'
+import { auth, db } from '../utils/firebase'
 
 const Stack= createStackNavigator();
 
 const Tab= createBottomTabNavigator();
 
+
 function HomeTabs() {
+
   return (
     <Tab.Navigator
       tabBarOptions= {{
@@ -76,7 +78,10 @@ function HomeTabs() {
     </Tab.Navigator>
   )
 }
+
+
 class Loading extends Component {
+
   componentDidMount() {
     auth.onAuthStateChanged((user)=> {
       if (user) {
@@ -88,11 +93,12 @@ class Loading extends Component {
   }
 
   render() {
-    const{ authedUser }= this.props
+    const { authedUser }= this.props
     return (
       <Stack.Navigator headerMode={'none'}>
         { authedUser === null | undefined ? (
-          <Stack.Screen name='Login' component={LoginStack}/>
+          <Stack.Screen name='Login' component={LoginStack}
+            />
         ):(
           <Stack.Screen name='Home' component={HomeTabs}/>
         )}
