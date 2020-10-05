@@ -1,21 +1,36 @@
 import React, { Component } from 'react'
 import {
+  KeyboardAvoidingView,
   Image,
+  Keyboard,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View } from 'react-native'
 import { connect } from 'react-redux'
 import * as ImagePicker from 'expo-image-picker'
 import Constants from 'expo-constants'
 import { auth, db, storageRef } from '../utils/firebase'
 import Profile from './Profile'
-import { updateProfilePic, updateArtist } from '../actions/users'
+import {
+  updateProfilePic,
+  updateArtist,
+  updateArtistAbout } from '../actions/users'
+
+const DismissKeyboard= ({ children })=> (
+  <TouchableWithoutFeedback
+    onPress={()=> Keyboard.dismiss()}>
+    {children}
+  </TouchableWithoutFeedback>
+)
 
 class Customize extends Component {
 
   state= {
+    about: null,
     artist: null,
     imgUri: null,
     loading: true,
@@ -44,6 +59,8 @@ class Customize extends Component {
       this.setState(currState=> ({
         imgUri: url,
         loading: false,
+        about: users[authedUser].artistAbout,
+        artist: users[authedUser].artistName,
       }), ()=> console.log('users img', url))
     })
   }
@@ -55,9 +72,12 @@ class Customize extends Component {
       this.setState(currState=> ({
         imgUri: url,
         loading: false,
+        about: users[authedUser].artistAbout,
+        artist: users[authedUser].artistName,
       }))
     })
   }
+
 
   pickImage= async ()=> {
     let result= await ImagePicker.launchImageLibraryAsync({
@@ -87,8 +107,15 @@ class Customize extends Component {
     }))
   }
 
+  handleAbout= (text)=> {
+    this.setState(currState=> ({
+      currState,
+      about: text,
+    }))
+  }
+
   saveSettings= async ()=> {
-    const { artist, display, imgUri }= this.state
+    const { about, artist, display, imgUri }= this.state
     const { authedUser, users }= this.props
     const imgName= `${imgUri.split('/').pop()}`
     const request= await fetch(imgUri)
@@ -108,12 +135,12 @@ class Customize extends Component {
     this.setProfilePic(imgName)
     this.setDisplayName(display)
     this.setArtistName(artist)
+    this.setArtistAbout(about)
   }
 
   setProfilePic= async (imgName)=> {
     const { authedUser, dispatch, users }= this.props
-
-     await db.ref(`users/${authedUser}/profilePic`).update({
+    await db.ref(`users/${authedUser}/profilePic`).update({
      imgName,
      }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
    }
@@ -129,16 +156,26 @@ class Customize extends Component {
 
   setArtistName= async (artist)=> {
     const { authedUser, dispatch, users }= this.props
-    await db.ref(`users/${authedUser}`).update({
+    await db.ref(`users/${authedUser}/`).update({
       artistName: artist,
     }, ()=> dispatch(updateArtist(authedUser, artist)))
   }
 
+  setArtistAbout= async (artistAbout)=> {
+    const { authedUser, dispatch, users }= this.props
+    await db.ref(`users/${authedUser}/`).update({
+      artistAbout: artistAbout,
+    }, ()=> dispatch(updateArtistAbout(authedUser, artistAbout)))
+  }
+
   render() {
-    const { imgUri, loading, display, artist }= this.state
+    const { about, artist, display, imgUri, loading, }= this.state
     if ( loading === false ) {
     return (
-      <View style={styles.container}>
+      <DismissKeyboard>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding': 'height'}
+        style={styles.container}>
         <View style={styles.imageButtonContainer}>
         <Image
           source={{uri:imgUri}}
@@ -150,6 +187,9 @@ class Customize extends Component {
             <Text style={{color: 'white'}}> Upload Image </Text>
           </TouchableOpacity>
         </View>
+        <TouchableWithoutFeedback
+          accessible={false}
+          onPress={Keyboard.dismiss}>
         <View style={styles.displayNameContainer}>
           <TextInput
             maxLength={20}
@@ -160,6 +200,8 @@ class Customize extends Component {
             style={styles.displayNameInput}
           />
         </View>
+        </TouchableWithoutFeedback>
+
         <View style={styles.artistContainer}>
           <TextInput
             maxLength={20}
@@ -170,12 +212,24 @@ class Customize extends Component {
             style={styles.artistInput}
           />
         </View>
+        <View style={styles.artistAboutContainer}>
+          <TextInput
+            maxLength={200}
+            multiline={true}
+            onChangeText= {(text)=>this.handleAbout(text)}
+            placeholder='Enter About'
+            placeholderTextColor= 'white'
+            value={about}
+            style={styles.aboutInput}
+          />
+        </View>
         <View>
           <TouchableOpacity onPress={this.saveSettings}>
             <Text> Save </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardAvoidingView>
+      </DismissKeyboard>
     )
   } else {
     return (
@@ -189,11 +243,26 @@ styles= StyleSheet.create({
   artistContainer: {
     alignItems: 'center',
     height: '10%',
-    marginTop: '5%',
+    width: '50%',
+  },
+
+  artistAboutContainer: {
+    alignItems: 'center',
+    height: '10%',
     width: '50%',
   },
 
   artistInput: {
+    borderColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: 'white',
+    height: '75%',
+    textAlign: 'center',
+    width: '100%',
+  },
+
+  aboutInput: {
     borderColor: 'white',
     borderRadius: 10,
     borderWidth: 1,

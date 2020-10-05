@@ -55,7 +55,7 @@ class TrackPlayer extends Component {
        this.setState(currState=> ({
          ...currState,
          playList: res,
-       }), ()=> console.log('playList here',this.state.playList))
+       }))
      })
   }
 
@@ -65,6 +65,8 @@ class TrackPlayer extends Component {
         this._playRecording()
         break;
       case 'donepause':
+        this._pauseAndPlayRecording()
+        break;
       case 'playing':
         this._pauseAndPlayRecording();
         break;
@@ -75,8 +77,6 @@ class TrackPlayer extends Component {
 
   _playRecording = async ()=> {
     const { index, playList }= this.state
-    console.log('heres our playList in play method', playList)
-    console.log('heres our source', playList[index].source)
     const source= {uri: playList[index].source}
     /* sound is declared, contains the audio.sound object
     when _playRecording is called, it is paused by the await

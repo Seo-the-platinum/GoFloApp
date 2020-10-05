@@ -2,7 +2,8 @@ import {
   RECEIVE_USERS,
   TOGGLE_STATUS,
   UPDATE_URL,
-  UPDATE_ARTIST } from '../actions/users';
+  UPDATE_ARTIST,
+  UPDATE_ARTIST_ABOUT, } from '../actions/users';
 
 export default function users(state={}, action) {
   switch(action.type) {
@@ -40,6 +41,15 @@ export default function users(state={}, action) {
         [action.authedUser]: {
           ...state[action.authedUser],
           artistName: artist,
+        }
+      }
+    case UPDATE_ARTIST_ABOUT:
+      const { artistAbout }= action
+      return {
+        ...state,
+        [action.authedUser]: {
+          ...state[action.authedUser],
+          artistAbout: artistAbout,
         }
       }
     default:

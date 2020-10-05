@@ -2,6 +2,7 @@ export const RECEIVE_USERS= 'RECEIVE_USERS'
 export const TOGGLE_STATUS= 'TOGGLE_STATUS'
 export const UPDATE_URL=  'UPDATE_URL'
 export const UPDATE_ARTIST= 'UPDATE_ARTIST'
+export const UPDATE_ARTIST_ABOUT= 'UPDATE_ARTIST_ABOUT'
 
 export function receiveUsers(users) {
   return {
@@ -30,5 +31,13 @@ export function updateArtist(authedUser, artist) {
     type: UPDATE_ARTIST,
     authedUser,
     artist,
+  }
+}
+
+export function updateArtistAbout(authedUser, artistAbout) {
+  return {
+    type: UPDATE_ARTIST_ABOUT,
+    authedUser,
+    artistAbout,
   }
 }

@@ -7,11 +7,12 @@ import {
 import { connect } from 'react-redux'
 import Track from './Track'
 import TrackPlayer from './TrackPlayer'
+import Record from './Record'
 import { fireStore } from '../utils/firebase'
 
 
-class Tracks extends Component {
 
+class Tracks extends Component {
   render() {
     const { authedUser, users }= this.props
     const tracks= Object.keys(users[authedUser].tracks)
@@ -43,6 +44,9 @@ class Tracks extends Component {
         })}
         <View>
           <TrackPlayer tracks={tracks}/>
+        </View>
+        <View>
+          <Record/>
         </View>
       </View>
     )
