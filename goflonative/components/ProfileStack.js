@@ -8,6 +8,7 @@ import Messages from './Messages'
 import Leaderboards from './Leaderboards'
 import Customize from './Customize'
 import { auth } from '../utils/firebase'
+import TracksStack from './TracksStack'
 
 const Stack= createStackNavigator();
 
@@ -36,7 +37,7 @@ export default function ProfileStack(){
           name='profile'
           component={Profile}
         />
-        <Stack.Screen name='The Vault' component={Tracks}/>
+        <Stack.Screen name='The Vault' component={TracksStack}/>
         <Stack.Screen
           name='Customize'
           component={Customize}

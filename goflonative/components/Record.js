@@ -72,7 +72,8 @@ class Record extends Component {
      playingStatus: 'playing'
    }))
  }
-  _updateScreenForSoundStatuus= (status)=> {
+
+  _updateScreenForSoundStatus= (status)=> {
     this.setState(currState=> ({
       ...currState,
       currentMillis: status.positionMillis,
@@ -97,6 +98,7 @@ class Record extends Component {
       playingStatus: 'playing',
     }))
   }
+
   _startRecording= async ()=> {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
@@ -111,10 +113,30 @@ class Record extends Component {
     const recording= new Audio.Recording()
     recording.setOnRecordingStatusUpdate(this._updateMillis())
     recording.setProgressUpdateInterval(1000)
-    console.log('recording info here!', this.state.recordingStatus, recording)
 
+    const recordingSettings = {
+  android: {
+    extension: ".m4a",
+    outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+    audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+  },
+  ios: {
+    extension: ".m4a",
+    outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_MPEG4AAC,
+    audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_MIN,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+    linearPCMBitDepth: 16,
+    linearPCMIsBigEndian: false,
+    linearPCMIsFloat: false,
+  },
+};
     try {
-      await recording.prepareToRecordAsync(Audio.Recording_Options_Preset_High_Quality)
+      await recording.prepareToRecordAsync(recordingSettings)
       await recording.startAsync()
 
     }
@@ -156,6 +178,7 @@ class Record extends Component {
     }
     const info= await FileSystem.getInfoAsync(this.recording.getURI() || '')
     console.log(`file info: ${JSON.stringify(info)}`)
+    const files= await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory + 'AV')
     this.setState(currState=> ({
       ...currState,
       uri:info.uri,
@@ -163,7 +186,6 @@ class Record extends Component {
   }
 
   _toggleRecord= async ()=> {
-    console.log(this.state.recordingStatus)
     switch (this.state.recordingStatus) {
       case 'notrecording':
         this._startRecording()
@@ -178,7 +200,6 @@ class Record extends Component {
 
   _buildTimer= ()=> {
     const { durationMillis, currentMillis, isRecording }= this.state
-    console.log(isRecording)
     const secs= ()=> {
       if (Math.floor(durationMillis / 1000) % 60 < 10) {
         return `0${Math.floor(durationMillis / 1000) % 60}`
@@ -211,6 +232,13 @@ class Record extends Component {
     const seekPosition= value * durationMillis
     this.sound.playFromPositionAsync(seekPosition)
   }
+
+  linkToUploadVox= ()=> {
+    const { uri }= this.state
+    const { selectedTrack, navigation }= this.props
+    navigation.navigate('UploadVox', {uri, selectedTrack})
+  }
+
   render() {
     const { timer, uri, isRecording, playingStatus }= this.state
     if ( uri !== null) {
@@ -249,6 +277,10 @@ class Record extends Component {
             onValueChange={this._onChangeSliderPosition}
             value={this._getSliderPosition()}
             />
+          <Button
+            title='Save'
+            onPress={this.linkToUploadVox}
+          />
         </View>
       )
     }
@@ -302,9 +334,10 @@ const styles= StyleSheet.create({
   }
 })
 
-function mapStateToProps({users, authedUser}) {
+function mapStateToProps({users, authedUser, selectedTrack}) {
   return {
     authedUser,
+    selectedTrack,
     users
   }
 }

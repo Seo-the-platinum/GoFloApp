@@ -10,6 +10,7 @@ import { Audio } from 'expo-av'
 import { Slider } from 'react-native'
 import { AntDesign, Fontisto } from '@expo/vector-icons'
 import { storageRef } from '../utils/firebase'
+import { setSelectedTrack } from '../actions/selectedTrack'
 
 let _isMounted= false
 class TrackPlayer extends Component {
@@ -77,6 +78,7 @@ class TrackPlayer extends Component {
 
   _playRecording = async ()=> {
     const { index, playList }= this.state
+    const { dispatch, tracks, authedUser, users }= this.props
     const source= {uri: playList[index].source}
     /* sound is declared, contains the audio.sound object
     when _playRecording is called, it is paused by the await
@@ -99,6 +101,7 @@ class TrackPlayer extends Component {
     this.setState(currState=> ({
       playingStatus: 'playing',
     }))
+    dispatch(setSelectedTrack(users[authedUser].tracks[tracks[index]].source))
   }
 
   _updateScreenForSoundStatus = (status) => {
@@ -158,6 +161,7 @@ class TrackPlayer extends Component {
 
   _increaseIndex= ()=> {
     const { index, playList }= this.state
+    const { authedUser, dispatch,users,tracks }= this.props
 
     if (index === playList.length -1) {
       this.setState(currState=> ({
@@ -170,6 +174,8 @@ class TrackPlayer extends Component {
         index: currState.index + 1,
       }), ()=>this._playRecording())
     }
+    dispatch(setSelectedTrack(users[authedUser].tracks[tracks[index]].source))
+
   }
 
   _prevTrack= async ()=> {
@@ -188,11 +194,12 @@ class TrackPlayer extends Component {
   if ( playingStatus === 'nosound' || playingStatus === 'donepause') {
     this._decreaseIndex()
   }
+
 }
 
   _decreaseIndex= ()=> {
   const { index, playList }= this.state
-
+  const { dispatch, users, authedUser, tracks }= this.props
   if (index === 0) {
   this.setState(currState=> ({
     ...currState,
@@ -204,6 +211,7 @@ class TrackPlayer extends Component {
       index: currState.index - 1,
     }), ()=>this._playRecording())
   }
+  dispatch(setSelectedTrack(users[authedUser].tracks[tracks[index]].source))
 }
 
   _getSliderPosition= ()=> {

@@ -162,7 +162,7 @@ class Customize extends Component {
   }
 
   setArtistAbout= async (artistAbout)=> {
-    const { authedUser, dispatch, users }= this.props
+    const { authedUser, dispatch }= this.props
     await db.ref(`users/${authedUser}/`).update({
       artistAbout: artistAbout,
     }, ()=> dispatch(updateArtistAbout(authedUser, artistAbout)))

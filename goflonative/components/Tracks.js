@@ -46,7 +46,7 @@ class Tracks extends Component {
           <TrackPlayer tracks={tracks}/>
         </View>
         <View>
-          <Record/>
+          <Record navigation= {this.props.navigation}/>
         </View>
       </View>
     )
