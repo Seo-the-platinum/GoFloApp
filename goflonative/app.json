@@ -28,6 +28,11 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes":  [
+          "audio",
+        ]
+      }
     },
   }
 }

@@ -13,13 +13,7 @@ import TracksStack from './TracksStack'
 const Stack= createStackNavigator();
 
 export default function ProfileStack(){
-  const routeName= ()=> {
-    if (auth.currentUser.displayName) {
-      return auth.currentUser.displayName
-    } else {
-      return 'Hello, user!'
-    }
-  }
+
     return (
       <Stack.Navigator
         headerMode={'float'}
@@ -29,21 +23,60 @@ export default function ProfileStack(){
           },
           headerTitleStyle: {
             color: 'white',
-          }
+          },
         }}
         initialRouteName='profile'>
-        <Stack.Screen name='ArtistPage' component={ArtistPage}/>
+        <Stack.Screen
+          name='ArtistPage'
+          component={ArtistPage}
+          options={{
+            headerBackTitleVisible: false,
+            headerTintColor: 'rgb(0, 117, 88)',
+          }}/>
         <Stack.Screen
           name='profile'
           component={Profile}
+          options={()=> {
+              if (auth.currentUser.displayName) {
+                return {
+                  title: `Hello, ${auth.currentUser.displayName}`
+                }
+              } else {
+                return {title: 'Hello User!'}
+              }
+            }
+          }
         />
-        <Stack.Screen name='The Vault' component={TracksStack}/>
+        <Stack.Screen
+          name='The Vault'
+          component={TracksStack}
+          options={{
+            headerBackTitleVisible: false,
+            headerTintColor: 'rgb(0, 117, 88)',
+          }}/>
         <Stack.Screen
           name='Customize'
           component={Customize}
+          options={{
+            headerBackTitleVisible: false,
+            headerTintColor: 'rgb(0, 117, 88)',
+          }}
           />
-        <Stack.Screen name='Leaderboards' component={Leaderboards}/>
-        <Stack.Screen name='Messages' component={Messages}/>
+        <Stack.Screen
+          name='Leaderboards'
+          component={Leaderboards}
+          options={{
+            headerBackTitleVisible: false,
+            headerTintColor: 'rgb(0, 117, 88)',
+          }}
+          />
+        <Stack.Screen
+          name='Messages'
+          component={Messages}
+          options={{
+            headerBackTitleVisible: false,
+            headerTintColor: 'rgb(0, 117, 88)',
+          }}/>
       </Stack.Navigator>
     )
   }

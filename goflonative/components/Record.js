@@ -56,7 +56,6 @@ class Record extends Component {
  }
 
  _playRecording= async ()=> {
-   console.log('the source', this.state.uri)
    const source= {uri: this.state.uri}
    const { sound }= await Audio.Sound.createAsync(
      source,
@@ -74,6 +73,7 @@ class Record extends Component {
  }
 
   _updateScreenForSoundStatus= (status)=> {
+    console.log('volume status here!', status.volume)
     this.setState(currState=> ({
       ...currState,
       currentMillis: status.positionMillis,
@@ -102,7 +102,7 @@ class Record extends Component {
   _startRecording= async ()=> {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
       playsInSilentModeIOS: true,
       shouldDuckAndroid: true,
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
@@ -178,7 +178,9 @@ class Record extends Component {
     }
     const info= await FileSystem.getInfoAsync(this.recording.getURI() || '')
     console.log(`file info: ${JSON.stringify(info)}`)
-    const files= await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory + 'AV')
+    //const files= await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory + 'AV')
+    const files= await FileSystem.readDirectoryAsync(FileSystem.cacheDirectory)
+
     this.setState(currState=> ({
       ...currState,
       uri:info.uri,

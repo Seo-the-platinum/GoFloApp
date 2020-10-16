@@ -79,6 +79,15 @@ class TrackPlayer extends Component {
   _playRecording = async ()=> {
     const { index, playList }= this.state
     const { dispatch, tracks, authedUser, users }= this.props
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: false,
+      staysActiveInBackground: true,
+    })
     const source= {uri: playList[index].source}
     /* sound is declared, contains the audio.sound object
     when _playRecording is called, it is paused by the await
@@ -91,6 +100,7 @@ class TrackPlayer extends Component {
       {
         shouldPlay: true,
         isLooping: false,
+
       },
       /* uses this._updateScreenForSoundStatus for the
       onPlaybackStatusUpdate prop*/
@@ -105,6 +115,7 @@ class TrackPlayer extends Component {
   }
 
   _updateScreenForSoundStatus = (status) => {
+    console.log('volume status here!', status.volume)
     this.setState(currState=> ({
       ...currState,
       currentMillis: status.positionMillis,
@@ -235,6 +246,7 @@ class TrackPlayer extends Component {
 
   buildTimer= ()=> {
     const { currentMillis, totalMillis }= this.state
+    if (currentMillis || totalMillis !== undefined) {
     const totalMins= `0${Math.floor(totalMillis/ 60000)}`
     const totalSecs= `${Math.floor(totalMillis/ 1000) % 60}`
     const secs= ()=> {
@@ -259,8 +271,12 @@ class TrackPlayer extends Component {
         timer: total,
       }))
     }
-
- }
+  } else {
+    this.setState(currState=> ({
+      timer: 'Loading...'
+    }))
+  }
+}
   render() {
     const { authedUser, tracks, users }= this.props
     const { index, playList, timer, playingStatus }= this.state

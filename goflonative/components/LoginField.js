@@ -52,7 +52,13 @@ class LoginField extends Component {
         online: true,
       })
     })
-    .catch((error)=> console.log(error.code, error.message))
+    .catch((error)=> {
+      console.log(error.code, error.message)
+      this.setState(currState=> ({
+        currState,
+        match: false,
+      }))
+    })
 
   }
 

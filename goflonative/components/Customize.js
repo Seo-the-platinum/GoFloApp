@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {
+  Button,
   KeyboardAvoidingView,
   Image,
   Keyboard,
@@ -35,6 +36,9 @@ class Customize extends Component {
     imgUri: null,
     loading: true,
     display: null,
+    influence1:null,
+    influence2:null,
+    influence3:null,
   }
 
   async componentDidMount() {
@@ -168,14 +172,54 @@ class Customize extends Component {
     }, ()=> dispatch(updateArtistAbout(authedUser, artistAbout)))
   }
 
+  setArtistsInfluences= async ()=> {
+    const { authedUser, dispatch }= this.props
+    const { influence1, influence2, influence3 }= this.state
+    await db.ref(`users/${authedUser}/favoriteArtist/`).update({
+      influence1,
+      influence2,
+      influence3,
+    })
+  }
+
+  handleArtistInfluence1= (text)=> {
+    const { influence1 }= this.state
+    this.setState(currState=> ({
+      currState,
+      influence1: text,
+    }))
+  }
+  handleArtistInfluence2= (text)=> {
+    const { influence2 }= this.state
+    this.setState(currState=> ({
+      currState,
+      influence2: text,
+    }))
+  }
+  handleArtistInfluence3= (text)=> {
+    const { influence3 }= this.state
+    this.setState(currState=> ({
+      currState,
+      influence3: text,
+    }))
+  }
   render() {
-    const { about, artist, display, imgUri, loading, }= this.state
+    const {
+      about,
+      artist,
+      display,
+      imgUri,
+      influence1,
+      influence2,
+      influence3,
+      loading, }= this.state
     if ( loading === false ) {
     return (
       <DismissKeyboard>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding': 'height'}
         style={styles.container}>
+        <View>
         <View style={styles.imageButtonContainer}>
         <Image
           source={{uri:imgUri}}
@@ -201,7 +245,6 @@ class Customize extends Component {
           />
         </View>
         </TouchableWithoutFeedback>
-
         <View style={styles.artistContainer}>
           <TextInput
             maxLength={20}
@@ -223,9 +266,35 @@ class Customize extends Component {
             style={styles.aboutInput}
           />
         </View>
-        <View>
-          <TouchableOpacity onPress={this.saveSettings}>
-            <Text> Save </Text>
+        <View style={styles.artistInfluences}>
+          <TextInput
+            maxLength={20}
+            onChangeText={text=> this.handleArtistInfluence1(text)}
+            placeholder='Enter musical influence...'
+            placeholderTextColor= 'white'
+            style={styles.influence1}
+            value={influence1}/>
+          <TextInput
+            maxLength={20}
+            onChangeText={text=> this.handleArtistInfluence2(text)}
+            placeholder='Enter musical influence...'
+            placeholderTextColor= 'white'
+            style={styles.influence2}
+            value={influence2}/>
+          <TextInput
+            maxLength={20}
+            onChangeText={text=> this.handleArtistInfluence3(text)}
+            placeholder='Enter musical influence...'
+            placeholderTextColor= 'white'
+            style={styles.influence3}
+            value={influence3}/>
+        </View>
+        </View>
+        <View style= {styles.saveContainer}>
+          <TouchableOpacity>
+            <Text style={styles.saveBtn}>
+              Save
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -236,7 +305,7 @@ class Customize extends Component {
       null
     )
   }
-  }
+ }
 }
 
 styles= StyleSheet.create({
@@ -247,6 +316,11 @@ styles= StyleSheet.create({
   },
 
   artistAboutContainer: {
+    alignItems: 'center',
+    height: '10%',
+    width: '50%',
+  },
+  artistInfluences: {
     alignItems: 'center',
     height: '10%',
     width: '50%',
@@ -319,6 +393,51 @@ styles= StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+
+  influence1: {
+    borderColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: 'white',
+    height: '75%',
+    textAlign: 'center',
+    width: '100%',
+  },
+
+  influence2: {
+    borderColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: 'white',
+    height: '75%',
+    textAlign: 'center',
+    width: '100%',
+  },
+
+  influence3: {
+    borderColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: 'white',
+    height: '75%',
+    textAlign: 'center',
+    width: '100%',
+  },
+  saveBtn: {
+    color: 'white',
+    fontSize: 18,
+  },
+
+  saveContainer: {
+    alignItems: 'center',
+    backgroundColor: 'rgb(0, 110, 64)',
+    borderColor: 'black',
+    borderRadius: 10,
+    borderWidth: 1,
+    height: '5%',
+    justifyContent: 'center',
+    width: '50%',
+  }
 })
 
 function mapStateToProps({ authedUser, users}) {

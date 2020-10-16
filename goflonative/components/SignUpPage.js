@@ -16,6 +16,7 @@ class SignUpPage extends Component {
     password:'',
     confirmPassword:'',
     userName:'',
+    taken: false,
   }
 
   handleUser=(text)=> {
@@ -47,10 +48,13 @@ class SignUpPage extends Component {
     }))
   }
 
-  signUp= ()=> {
+  signUp= async ()=> {
     const { email, password, confirmPassword, userName }= this.state
-    console.log(userName)
-    if ( password === confirmPassword ) {
+    const { users }= this.props
+    const usersList= Object.keys(users)
+    const userNamesList= usersList.map((u)=> users[u].displayName.toUpperCase())
+
+    if ( password === confirmPassword && !userNamesList.includes(userName.toUpperCase())) {
       auth.createUserWithEmailAndPassword(email, password)
       .then(()=> auth.currentUser.updateProfile({displayName: userName}))
       .then(()=> this.addUserToDb(auth.currentUser.uid))
@@ -63,15 +67,22 @@ class SignUpPage extends Component {
         }
         console.log(error)
       })
+    } else {
+      this.setState(currState=> ({
+        currState,
+        taken: true,
+      }))
     }
   }
 
   addUserToDb= async (userId)=> {
     const { dispatch }= this.props
+    const { userName }= this.state
     console.log('here is the UID', userId)
     await db.ref('users/' + userId).set({
       artistAbout: 'Tell us about you...',
       artistName: 'Artist or Group name here...',
+      displayName: userName,
       favoriteArtist: ['Artist1', 'Artist2', 'Artist3'],
       online: false,
       profilePic: {
@@ -88,7 +99,11 @@ class SignUpPage extends Component {
     })
   }
   render() {
-    const { email, password, confirmPassword, userName }= this.state
+    const { email,
+            password,
+            confirmPassword,
+            userName,
+            taken, }= this.state
 
     return (
       <View style={styles.container}>
@@ -114,6 +129,16 @@ class SignUpPage extends Component {
               <Text style={{color: 'white', flex: 1, fontSize: 24}}> Password</Text>
             </View>
           </View>
+          <View style={styles.confirmPasswordArea}>
+            <TextInput
+              style={styles.confirmPassword}
+              value={confirmPassword}
+              onChangeText={(text)=> this.handleConfirm(text)}
+              secureTextEntry={true}/>
+            <Text style={{color: 'white', flex: 2, fontSize: 24, }}>
+              Confirm Password
+            </Text>
+          </View>
           <View style={styles.userNameArea}>
             <TextInput
               style={styles.userName}
@@ -123,20 +148,19 @@ class SignUpPage extends Component {
             <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
               <AntDesign name='user' size={24} color='white'/>
               <Text style={{color: 'white', flex: 1, fontSize: 24}}> Username</Text>
+              {taken ? <Text style={{color: 'red'}}>
+                Username is already taken, please try another userName
+                </Text>: null}
             </View>
-          </View>
-          <View style={styles.confirmPasswordArea}>
-            <TextInput
-              style={styles.confirmPassword}
-              value={confirmPassword}
-              onChangeText={(text)=> this.handleConfirm(text)}
-              secureTextEntry={true}/>
-            <Text style={{color: 'white', flex: 2, fontSize: 24, }}> Confirm Password</Text>
           </View>
             <TouchableOpacity
               onPress={this.signUp}
               style={styles.signUp}>
-              <Text style={{color: 'white', fontSize: 24}}>sign up</Text>
+              <Text style={{
+                color: 'white', fontSize: 24
+              }}
+                >sign up
+              </Text>
             </TouchableOpacity>
         </View>
       </View>
@@ -185,7 +209,7 @@ const styles= StyleSheet.create({
     borderColor: 'white',
     borderWidth: 2,
     borderRadius: 10,
-    backgroundColor: 'rgb(17, 173, 59)',
+    backgroundColor: 'rgb(0, 117, 105)',
     height: '15%',
     justifyContent: 'center',
     padding: 5,
@@ -219,4 +243,9 @@ const styles= StyleSheet.create({
   }
 })
 
-export default connect()(SignUpPage)
+function mapStateToProps({users}) {
+  return {
+    users,
+  }
+}
+export default connect(mapStateToProps)(SignUpPage)

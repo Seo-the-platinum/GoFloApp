@@ -13,6 +13,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import ArtistPage from './ArtistPage'
 import { auth, storageRef } from '../utils/firebase'
 import UpdatedImage from './UpdatedImage'
+import FindFriends from './FindFriends'
 
 class Profile extends Component {
   state= {
@@ -75,7 +76,6 @@ class Profile extends Component {
   render() {
     const { authedUser, users }= this.props
     const { imgUri, loading }= this.state
-    const { displayName }= auth.currentUser
     if ( loading === false && authedUser !== null ) {
     return (
       <View>
@@ -197,6 +197,7 @@ class Profile extends Component {
             imageStyle={{resizeMode: 'contain'}}
           />
         </View>
+        <FindFriends/>
       </View>
     )} else { return (null)}
   }
