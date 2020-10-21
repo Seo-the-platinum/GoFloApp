@@ -96,14 +96,14 @@ class Customize extends Component {
       imgUri: result.uri,
     }))
   }
-
+/*
   handleDisplayName= (text)=> {
     this.setState(currState=> ({
       currState,
       display: text,
     }))
   }
-
+*/
   handleArtistName= (text)=> {
     this.setState(currState=> ({
       currState,
@@ -137,9 +137,10 @@ class Customize extends Component {
       await locRef.put(blob)
     }
     this.setProfilePic(imgName)
-    this.setDisplayName(display)
+    //this.setDisplayName(display)
     this.setArtistName(artist)
     this.setArtistAbout(about)
+    this.setArtistsInfluences()
   }
 
   setProfilePic= async (imgName)=> {
@@ -148,7 +149,7 @@ class Customize extends Component {
      imgName,
      }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
    }
-
+/*
   setDisplayName= async (display)=> {
     const { authedUser, dispatch, users }= this.props
     const user= auth.currentUser
@@ -157,7 +158,7 @@ class Customize extends Component {
     }).then(()=> console.log(`display name has been update to ${display}`))
     .catch((error)=> console.log('setDisplayName error:',error))
   }
-
+*/
   setArtistName= async (artist)=> {
     const { authedUser, dispatch, users }= this.props
     await db.ref(`users/${authedUser}/`).update({
@@ -176,9 +177,9 @@ class Customize extends Component {
     const { authedUser, dispatch }= this.props
     const { influence1, influence2, influence3 }= this.state
     await db.ref(`users/${authedUser}/favoriteArtist/`).update({
-      influence1,
-      influence2,
-      influence3,
+      0:influence1,
+      1:influence2,
+      2:influence3,
     })
   }
 
@@ -231,20 +232,7 @@ class Customize extends Component {
             <Text style={{color: 'white'}}> Upload Image </Text>
           </TouchableOpacity>
         </View>
-        <TouchableWithoutFeedback
-          accessible={false}
-          onPress={Keyboard.dismiss}>
-        <View style={styles.displayNameContainer}>
-          <TextInput
-            maxLength={20}
-            onChangeText={(text)=>this.handleDisplayName(text)}
-            placeholder='Enter Display Name'
-            placeholderTextColor= 'white'
-            value={display}
-            style={styles.displayNameInput}
-          />
-        </View>
-        </TouchableWithoutFeedback>
+
         <View style={styles.artistContainer}>
           <TextInput
             maxLength={20}
@@ -291,7 +279,7 @@ class Customize extends Component {
         </View>
         </View>
         <View style= {styles.saveContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={this.saveSettings}>
             <Text style={styles.saveBtn}>
               Save
             </Text>

@@ -8,6 +8,8 @@ import Main from './Main'
 import ProfileStack from './ProfileStack'
 import Settings from './Settings'
 import { auth, db } from '../utils/firebase'
+import { FontAwesome } from '@expo/vector-icons';
+import SearchScreen from './SearchScreen'
 
 const Stack= createStackNavigator();
 
@@ -23,6 +25,7 @@ function HomeTabs() {
         style: {
           height: '7%',
           paddingBottom: 0,
+          backgroundColor: 'rgb(0, 117, 88)'
         }
       }}
     >
@@ -75,6 +78,20 @@ function HomeTabs() {
           }
         }}
         name='Settings' component={Settings}/>
+      <Tab.Screen
+        options={{
+          tabBarIcon:()=> {
+            return (
+              <FontAwesome
+                name="search-plus"
+                size={24}
+                color="black"
+                />
+            )
+          }
+        }}
+        name='Search'
+        component={SearchScreen}/>
     </Tab.Navigator>
   )
 }

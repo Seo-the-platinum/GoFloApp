@@ -52,7 +52,9 @@ class SignUpPage extends Component {
     const { email, password, confirmPassword, userName }= this.state
     const { users }= this.props
     const usersList= Object.keys(users)
-    const userNamesList= usersList.map((u)=> users[u].displayName.toUpperCase())
+    const userNamesList= usersList.map((u)=> {
+      if ( users[u].displayName !== undefined) {
+      return users[u].displayName.toUpperCase()}})
 
     if ( password === confirmPassword && !userNamesList.includes(userName.toUpperCase())) {
       auth.createUserWithEmailAndPassword(email, password)
@@ -78,7 +80,6 @@ class SignUpPage extends Component {
   addUserToDb= async (userId)=> {
     const { dispatch }= this.props
     const { userName }= this.state
-    console.log('here is the UID', userId)
     await db.ref('users/' + userId).set({
       artistAbout: 'Tell us about you...',
       artistName: 'Artist or Group name here...',
@@ -96,6 +97,7 @@ class SignUpPage extends Component {
           title: 'Minx',
         },
       },
+      uid:userId,
     })
   }
   render() {

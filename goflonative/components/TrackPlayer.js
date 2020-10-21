@@ -41,7 +41,7 @@ class TrackPlayer extends Component {
   }
 
    _buildSongsObj= async ()=> {
-     const { authedUser, users, tracks, }= this.props
+     const { authedUser, users, tracks }= this.props
        const promises= tracks.map(s=> {
        const fireSource= storageRef.child(users[authedUser].tracks[s].source)
        return fireSource.getDownloadURL().then((url)=> {

@@ -197,7 +197,6 @@ class Profile extends Component {
             imageStyle={{resizeMode: 'contain'}}
           />
         </View>
-        <FindFriends/>
       </View>
     )} else { return (null)}
   }
