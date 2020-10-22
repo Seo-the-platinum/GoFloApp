@@ -7,7 +7,7 @@ import { FlatList,
          TouchableOpacity,
          View } from 'react-native'
 import { connect } from 'react-redux'
-import { storageRef } from '../utils/firebase'
+import { db, storageRef } from '../utils/firebase'
 
 class Messages extends Component {
   state={
@@ -21,6 +21,7 @@ class Messages extends Component {
   setData= async ()=> {
     const { authedUser, users }= this.props
     const { data }= this.state
+    if ( users[authedUser].recievedRequest !== undefined) {
     const requestList= Object.keys(users[authedUser].recievedRequest)
     const promises= requestList.map((r, index)=> {
       const fireSource= storageRef.child(`images/${users[users[authedUser].recievedRequest[r]].profilePic.imgName}`)
@@ -39,9 +40,33 @@ class Messages extends Component {
       }))
     })
   }
+}
 
-  handleAccept= (item)=> {
-    console.log(item)
+  handleAccept= async (item)=> {
+    const { authedUser, users }= this.props
+    await db.ref(`users/${authedUser}`).update({
+      friends: [item.uid],
+    })
+    await db.ref(`users/${item.uid}`).update({
+      friends: [users[authedUser].uid],
+    })
+    await db.ref(`users/${authedUser}/recievedRequest/${item.index}`).remove()
+    await db.ref(`users/${item.uid}/sentRequest/${item.index}`).remove()
+
+    this.setState(currState=> ({
+      currState,
+      data: this.state.data.filter(i => i !== item)
+    }))
+  }
+
+  handleDecline= async (item)=> {
+    const { authedUser }= this.props
+    await db.ref(`users/${item.uid}/sentRequest/${item.index}`).remove()
+    await db.ref(`users/${authedUser}/recievedRequest/${item.index}`).remove()
+    this.setState(currState=> ({
+      currState,
+      data: this.state.data.filter(i => i !== item)
+    }))
   }
 
   renderItem= ({item})=> (
@@ -57,10 +82,13 @@ class Messages extends Component {
       </View>
       <View style={{flex: 1, flexDirection: 'row', height: '100%', alignItems: 'center'}}>
         <TouchableOpacity
+          onPress={()=> this.handleAccept(item)}
           style={styles.accOrDecBtn}>
           <Text style={{color: 'white'}}> Accept </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.accOrDecBtn}>
+        <TouchableOpacity
+          onPress={()=> this.handleDecline(item)}
+          style={styles.accOrDecBtn}>
           <Text style={{color: 'white'}}> Decline </Text>
         </TouchableOpacity>
       </View>
@@ -69,6 +97,7 @@ class Messages extends Component {
 
   render() {
     const { data }= this.state
+    console.log('index here', data)
     return (
       <View style={styles.container}>
         <Text>

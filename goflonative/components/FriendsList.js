@@ -10,15 +10,35 @@ import { connect } from 'react-redux'
 
 
 class FriendsList extends Component {
-  render() {
+  state={
+    online: [],
+    offline: [],
+  }
+
+  componentDidMount() {
+    this.getFriends()
+  }
+
+  getFriends= ()=> {
     const { users, authedUser }= this.props
-    const onlineData= Object.keys(users).filter(u=>
-      users[u].online === true && users[u].userName !== u
-    )
-    const offlineData= Object.keys(users).filter(u=>
-      users[u].online === false
-    )
-    console.log(onlineData, offlineData)
+    const onlineData= Object.keys(users[authedUser].friends).filter(index=> {
+      return users[users[authedUser].friends[index]].online === true
+    })
+    const offlineData= Object.keys(users[authedUser].friends).filter(index=> {
+      return users[users[authedUser].friends[index]].online === false
+    })
+    this.setState(currState=> ({
+      currState,
+      online: onlineData,
+      offline: offlineData,
+    }), ()=> console.log('state callback function', this.state))
+  }
+
+  render() {
+    const { online, offline }= this.state
+    const { users, authedUser }= this.props
+    console.log('hello friends', online, offline)
+
     return (
       <View>
         <View style={styles.header}>
@@ -35,12 +55,12 @@ class FriendsList extends Component {
                 ONLINE
               </Text>
               <View style={styles.onlineView}>
-                {onlineData.map(i=> {
+                {online.map(i=> {
                   return (
                     <Text
                       key={i}
                       style={{color: 'white'}}>
-                      {users[i].userName}
+                      {users[users[authedUser].friends[i]].displayName}
                     </Text>
                   )
                 })}
@@ -55,12 +75,12 @@ class FriendsList extends Component {
                 OFFLINE
               </Text>
                 <View style={styles.offlineView}>
-               {offlineData.map(i => {
+               {offline.map(i => {
                  return (
                  <Text
                    style={{color: 'white'}}
                    key={i}>
-                   {users[i].userName}
+                   {users[users[authedUser].friends[i]].displayName}
                  </Text>
                )
                })}
