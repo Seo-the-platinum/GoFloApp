@@ -8,7 +8,7 @@ const Stack= createStackNavigator()
 class TracksStack extends Component {
   render() {
     return (
-      <Stack.Navigator initialRouteName= 'The Vault' headerMode='none'>
+      <Stack.Navigator initialRouteName= 'The Vault'>
         <Stack.Screen name= 'The Vault' component={Tracks}/>
         <Stack.Screen name= 'UploadVox' component={UploadVox}/>
       </Stack.Navigator>

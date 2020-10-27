@@ -21,23 +21,26 @@ class FriendsList extends Component {
 
   getFriends= ()=> {
     const { users, authedUser }= this.props
-    const onlineData= Object.keys(users[authedUser].friends).filter(index=> {
-      return users[users[authedUser].friends[index]].online === true
-    })
-    const offlineData= Object.keys(users[authedUser].friends).filter(index=> {
-      return users[users[authedUser].friends[index]].online === false
-    })
-    this.setState(currState=> ({
-      currState,
-      online: onlineData,
-      offline: offlineData,
-    }), ()=> console.log('state callback function', this.state))
+    if (users[authedUser].friends !== undefined) {
+      const onlineData= Object.keys(users[authedUser].friends).filter(index=> {
+        return users[users[authedUser].friends[index]].online === true
+      })
+      const offlineData= Object.keys(users[authedUser].friends).filter(index=> {
+        return users[users[authedUser].friends[index]].online === false
+      })
+      this.setState(currState=> ({
+        currState,
+        online: onlineData,
+        offline: offlineData,
+      }), ()=> console.log('state callback function', this.state))
+    } else {
+      return ;
+    }
   }
 
   render() {
     const { online, offline }= this.state
     const { users, authedUser }= this.props
-    console.log('hello friends', online, offline)
 
     return (
       <View>
@@ -55,7 +58,8 @@ class FriendsList extends Component {
                 ONLINE
               </Text>
               <View style={styles.onlineView}>
-                {online.map(i=> {
+                { online !== undefined ? (
+                  online.map(i=> {
                   return (
                     <Text
                       key={i}
@@ -63,7 +67,8 @@ class FriendsList extends Component {
                       {users[users[authedUser].friends[i]].displayName}
                     </Text>
                   )
-                })}
+                })): null
+              }
               </View>
             </View>
             <View
@@ -75,7 +80,8 @@ class FriendsList extends Component {
                 OFFLINE
               </Text>
                 <View style={styles.offlineView}>
-               {offline.map(i => {
+               {  offline !== undefined ? (
+                 offline.map(i => {
                  return (
                  <Text
                    style={{color: 'white'}}
@@ -83,7 +89,7 @@ class FriendsList extends Component {
                    {users[users[authedUser].friends[i]].displayName}
                  </Text>
                )
-               })}
+             })): null}
                </View>
             </View>
           </ImageBackground>

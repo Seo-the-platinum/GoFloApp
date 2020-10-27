@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import Profile from './Profile'
 import ArtistPage from './ArtistPage'
 import Tracks from './Tracks'
-import Messages from './Messages'
+import MessagesStack from './MessagesStack'
 import Leaderboards from './Leaderboards'
 import Customize from './Customize'
 import { auth } from '../utils/firebase'
@@ -13,7 +13,6 @@ import TracksStack from './TracksStack'
 const Stack= createStackNavigator();
 
 export default function ProfileStack(){
-
     return (
       <Stack.Navigator
         headerMode={'float'}
@@ -25,7 +24,7 @@ export default function ProfileStack(){
             color: 'white',
           },
         }}
-        initialRouteName='profile'>
+        initialRouteName='Profile'>
         <Stack.Screen
           name='ArtistPage'
           component={ArtistPage}
@@ -34,7 +33,7 @@ export default function ProfileStack(){
             headerTintColor: 'rgb(0, 117, 88)',
           }}/>
         <Stack.Screen
-          name='profile'
+          name='Profile'
           component={Profile}
           options={()=> {
               if (auth.currentUser.displayName) {
@@ -72,10 +71,11 @@ export default function ProfileStack(){
           />
         <Stack.Screen
           name='Messages'
-          component={Messages}
+          component={MessagesStack}
           options={{
             headerBackTitleVisible: false,
             headerTintColor: 'rgb(0, 117, 88)',
+            headerShown: false,
           }}/>
       </Stack.Navigator>
     )

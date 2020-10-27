@@ -8,13 +8,15 @@ import { FlatList,
          View } from 'react-native'
 import { connect } from 'react-redux'
 import { db, storageRef } from '../utils/firebase'
+import { Entypo } from '@expo/vector-icons'
+import NewMessage from './NewMessage'
 
 class Messages extends Component {
   state={
     data: [],
   }
 
-  componentDidMount() {
+  componentDidMount() { 
      this.setData()
   }
 
@@ -69,6 +71,11 @@ class Messages extends Component {
     }))
   }
 
+  toNewMessage=()=> {
+    const { navigation }= this.props
+    navigation.navigate('NewMessage')
+  }
+
   renderItem= ({item})=> (
     <View style={styles.itemContainer}>
       <Image
@@ -97,26 +104,40 @@ class Messages extends Component {
 
   render() {
     const { data }= this.state
-    console.log('index here', data)
     return (
       <View style={styles.container}>
-        <Text>
-          Friend Requests
-        </Text>
-        <SafeAreaView style={{width: '97%'}}>
-          <FlatList
-            data={data}
-            keyExtractor={item=> item.index.toString()}
-            renderItem={this.renderItem}
-            style={{width: '100%'}}
-          />
-        </SafeAreaView>
-        <View>
-          <Text>
+        <View style={styles.friendRequestView}>
+          <Text style={styles.header}>
+            Friend Requests
           </Text>
-        </View><View>
-          <Text>
-          </Text>
+          <SafeAreaView style={{width: '97%'}}>
+            <FlatList
+              data={data}
+              keyExtractor={item=> item.index.toString()}
+              renderItem={this.renderItem}
+              style={{width: '100%'}}
+            />
+          </SafeAreaView>
+        </View>
+        <View style={styles.messagesView}>
+          <View style={styles.messagesHeader}>
+            <View style={{
+              alignItems: 'center',
+              width: '85%'}}>
+              <Text style={styles.header}>
+                Messages
+              </Text>
+            </View>
+            <View>
+              <TouchableOpacity onPress={this.toNewMessage}>
+                <Entypo
+                  name="new-message"
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
     )
@@ -124,11 +145,29 @@ class Messages extends Component {
 }
 
 const styles= StyleSheet.create({
+
+  accOrDecBtn: {
+    alignItems: 'center',
+    backgroundColor: 'rgb(0, 117, 88)',
+    flex: 1,
+    height: '70%',
+    justifyContent: 'center',
+    margin: '1%',
+    width: '20%'
+  },
+
   container: {
     alignItems: 'center',
-    borderColor: 'blue',
-    borderWidth: 1,
     flex: 1,
+  },
+
+  friendRequestView: {
+    alignItems: 'center',
+    width: '100%',
+  },
+
+  header: {
+    fontSize: 36,
   },
 
   itemContainer: {
@@ -141,21 +180,29 @@ const styles= StyleSheet.create({
     padding: '1%',
   },
 
+  messagesHeader: {
+    alignItems: 'flex-end',
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+  },
+
+  messagesView: {
+    alignItems: 'flex-start',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+  },
+
   thumbImg: {
     borderRadius: 40,
     height: 40,
     width: 40,
   },
 
-  accOrDecBtn: {
-    alignItems: 'center',
-    backgroundColor: 'rgb(0, 117, 88)',
-    flex: 1,
-    height: '70%',
-    justifyContent: 'center',
-    margin: '1%',
-    width: '20%'
-  }
 })
 
 function mapStateToProps({users, authedUser}) {
