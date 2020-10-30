@@ -24,7 +24,6 @@ class LoginField extends Component {
   componentDidMount() {
     usersRef.on('value', snapshot=> {
       let data= snapshot.val()
-      console.log('hello data!', data)
       this.props.dispatch(handleInitialData(data))
     })
   }

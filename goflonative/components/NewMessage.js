@@ -34,6 +34,7 @@ class NewMessage extends Component {
     if ( search.length < 1) {
       this.setState(currState=> ({
         currState,
+        data: [],
         filteredData: [],
       }))
     } else {
@@ -50,7 +51,7 @@ class NewMessage extends Component {
       this.setState(currState=>({
         currState,
         data: usersFilter,
-      }), ()=> this.retrieveUrls(this.state.data))
+      }), ()=> this.debounce(this.retrieveUrls(this.state.data), 250))
     }
   }
 
@@ -59,7 +60,6 @@ class NewMessage extends Component {
     const promises =uidArr.map(uid=> {
       const fireSource= storageRef.child(`images/${users[uid].profilePic.imgName}`)
       return fireSource.getDownloadURL().then(url=> {
-        console.log('fired!', url)
         return {
           ...users[uid],
           trueUrl: url,
@@ -70,23 +70,30 @@ class NewMessage extends Component {
       this.setState(currState=> ({
         ...currState,
         filteredData: res,
-      }))
+      }), ()=> {
+        this.state.search.length < 1 ? (
+          this.setState(currState=> ({
+            ...currState,
+            filteredData: [],
+          }))
+        ): null
+      })
     })
   }
-/*
+
   debounce= function (fn, wait) {
-    console.log(wait)
     let t
     return ()=>   {
       clearTimeout(t)
       t= setTimeout(() => fn.apply(this, arguments), wait)
     }
   }
-  */
+
 
   toMessage= (item)=> {
     const { navigation, users }= this.props
     navigation.navigate('Conversation', {
+      uid: item.uid,
       name: users[item.uid].displayName,
       url: item.trueUrl,
     })
@@ -108,7 +115,6 @@ class NewMessage extends Component {
 
   render() {
     const { search, filteredData }= this.state
-
     return (
       <View>
         <SearchBar
