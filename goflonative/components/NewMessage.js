@@ -89,7 +89,6 @@ class NewMessage extends Component {
     }
   }
 
-
   toMessage= (item)=> {
     const { navigation, users }= this.props
     navigation.navigate('Conversation', {

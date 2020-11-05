@@ -32,7 +32,7 @@ class FriendsList extends Component {
         currState,
         online: onlineData,
         offline: offlineData,
-      }), ()=> console.log('state callback function', this.state))
+      }))
     } else {
       return ;
     }

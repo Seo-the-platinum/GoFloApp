@@ -10,14 +10,15 @@ import { connect } from 'react-redux'
 import { db, storageRef } from '../utils/firebase'
 import { Entypo } from '@expo/vector-icons'
 import NewMessage from './NewMessage'
+import ExistingConvos from './ExistingConvos'
 
 class Messages extends Component {
   state={
     data: [],
   }
 
-  componentDidMount() { 
-     this.setData()
+  componentDidMount() {
+    this.setData()
   }
 
   setData= async ()=> {
@@ -104,6 +105,7 @@ class Messages extends Component {
 
   render() {
     const { data }= this.state
+    const { authedUser, users }= this.props
     return (
       <View style={styles.container}>
         <View style={styles.friendRequestView}>
@@ -137,6 +139,9 @@ class Messages extends Component {
                 />
               </TouchableOpacity>
             </View>
+          </View>
+          <View>
+            <ExistingConvos/>
           </View>
         </View>
       </View>

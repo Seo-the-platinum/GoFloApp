@@ -19,10 +19,8 @@ class Conversation extends Component {
     str: '',
     messages: null,
     ids: null,
-    height: 400,
-    amOrPm: 'AM',
+    height: 200,
     messageTime: null,
-    timeStamp: null,
     filteredMessages:[],
     chronoOrder: [],
   }
@@ -65,17 +63,16 @@ buildMessages= ()=> {
       filteredMessages: loop,
     }), ()=>this.chronoMessages())
 }
+
 chronoMessages= ()=> {
   const { filteredMessages }= this.state
-  console.log('filteredMessages', filteredMessages)
   const chronoList=filteredMessages.sort((a,b)=> {
     return a.timeStamp - b.timeStamp
-  })
-  console.log('chronoList',chronoList)
+  }).reverse()
   this.setState(currState=> ({
     currState,
     chronoOrder: chronoList,
-  }), ()=> console.log('heres the order',this.state.chronoOrder))
+  }))
 }
 
   updateSize= (height)=> {
@@ -86,28 +83,54 @@ chronoMessages= ()=> {
   }
 
   sendMessage=()=> {
-    const { messages }= this.state
+    const { messages, amOrPm }= this.state
     const{ authedUser, users }= this.props
+    const chat= `${users[authedUser].displayName}/${users[this.props.route.params.uid].displayName}`
     const data= this.createMessage()
-    db.ref('messages/' + data.id).set(
+
+    db.ref('messages/'+ data.id).set(
        data
     )
-    db.ref('users/'+ users[authedUser].uid+'/messages/sent/'+ data.id).set(
-      data.id
-    )
-    db.ref('users/' + data.recepient + '/messages/received' + data.id).set(
-      data.id
-    )
+    db.ref('users/'+ users[authedUser].uid+'/messages/'+ data.id).set({
+      id:data.id,
+      recepient:data.recepient,
+    })
+    db.ref('users/' + data.recepient + '/messages/'+ data.id).set({
+      id:data.id,
+      author:data.author,
+    })
+    this.setState(currState=> ({
+      currState,
+      str: ''
+    }))
   }
 
+  setTime= (initTime)=> {
+    const time= new Date(initTime)
+    const hours= time.getHours()
+    const mins= time.getMinutes()
+    if (hours >= 12 && mins < 10) {
+      return `${hours-12}: 0${mins} Pm`
+    }
+    else if (hours >= 12) {
+      return `${hours -12}: ${mins}Pm`
+    }
+    else if (mins < 10) {
+      return `${hours}: 0${mins}Am`
+    }
+    else {
+      return `${hours}:${mins}Am`
+    }
+  }
   createMessage= ()=> {
-    const { str, timeStamp }= this.state
+    const { str }= this.state
     const { authedUser, users }= this.props
+    const initTime= Date.now()
     return {
       author: users[authedUser].uid,
       id: this.idGenerator(),
-      timeStamp: Date.now(),
-      displayTime: this.timeStampGenerator(),
+      timeStamp: initTime,
+      displayTime: this.setTime(initTime),
       recepient: this.props.route.params.uid,
       text: str,
     }
@@ -120,33 +143,6 @@ chronoMessages= ()=> {
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())
   }
 
-  timeStampGenerator= ()=> {
-    const time= new Date(Date.now())
-    const secs= time.getSeconds()
-    const mins= ()=> {
-      if (time.getMinutes() < 10) {
-        return `0${time.getMinutes()}`
-      } else {
-        return time.getMinutes()
-      }
-    }
-    const hrs= ()=> {
-      if (time.getHours() > 12) {
-        this.setState(currState=> ({
-          currState,
-          amOrPm: 'PM',
-        }))
-        return time.getHours() -12
-      } else {
-          this.setState(currState=> ({
-            currState,
-            amOrPm: 'AM',
-          }))
-        return time.getHours()
-      }
-    }
-    return `${hrs()}:${mins()}${this.state.amOrPm}`
-  }
 
   handleText= (text)=> {
     const { str }= this.state
@@ -160,15 +156,21 @@ chronoMessages= ()=> {
       styles.sentContainer,
       item.author === this.props.route.params.uid ? styles.receivedContainer:
       styles.sentContainer]}>
-      <Text> {item.text}</Text>
-      <Text>{item.displayTime}</Text>
+      <View style={[styles.textContainer,
+        item.author === this.props.route.params.uid ? styles.textContainer:
+        styles.sentTextContainer]}>
+        <Text style={styles.textStyle}> {item.text}</Text>
+      </View>
+      <View>
+        <Text style={{color: 'white'}}>{item.displayTime}</Text>
+      </View>
     </View>
   )
 
   render() {
     const { displayName, authedUser }= this.props
     const { name, url, uid }= this.props.route.params
-    const { filteredMessages }= this.state
+    const { filteredMessages, str }= this.state
     let height= this.state.height
 
     return (
@@ -178,11 +180,14 @@ chronoMessages= ()=> {
         style={styles.container}
       >
         <SafeAreaView style={styles.messageThread}>
-          <FlatList
-            data={filteredMessages}
-            renderItem={this.renderMessages}
-            keyExtractor={item=> item.id}
-          />
+          <View style={{flex: 1}}>
+            <FlatList
+              data={filteredMessages}
+              renderItem={this.renderMessages}
+              keyExtractor={item=> item.id}
+              inverted
+            />
+          </View>
         </SafeAreaView>
         <View style={{
           flex: .5,
@@ -206,6 +211,7 @@ chronoMessages= ()=> {
               multiline
               onContentSizeChange={(e)=> this.updateSize(e.nativeEvent.contentSize.height)}
               style={styles.textInput}
+              value={str}
              />
              <TouchableOpacity
                onPress={this.sendMessage}
@@ -222,6 +228,7 @@ chronoMessages= ()=> {
 
 const styles= StyleSheet.create({
   container: {
+    backgroundColor: 'gray',
     flex: 1,
     justifyContent: 'flex-end',
   },
@@ -238,17 +245,15 @@ const styles= StyleSheet.create({
   },
 
   messageThread: {
-    borderColor: 'red',
-    borderWidth: 1,
+    backgroundColor: 'gray',
     flex: 5,
   },
 
   receivedContainer: {
     alignItems: 'flex-start',
-    borderColor: 'green',
-    borderWidth: 1,
-    justifyContent: 'flex-start',
-    height: '100%',
+    flex: 1,
+    justifyContent: 'flex-end',
+    margin: '2%',
   },
 
   sendBtn: {
@@ -264,13 +269,40 @@ const styles= StyleSheet.create({
 
   sentContainer: {
     alignItems: 'flex-end',
-    borderColor: 'green',
-    borderWidth: 1,
+    flex: 1,
     justifyContent: 'flex-end',
-    height: '100%',
+    margin: '2%',
+  },
+
+  sentTextContainer: {
+    alignItems: 'flex-end',
+    backgroundColor:'rgb(0, 117, 88)',
+    borderColor:'rgb(1, 145, 81)',
+    borderRadius: 20,
+    borderWidth: 2,
+    justifyContent: 'flex-end',
+    margin: '1%',
+    maxWidth: '50%',
+    textAlign: 'right',
+  },
+
+  textContainer: {
+    backgroundColor:'rgb(0, 96, 99)',
+    borderColor:'rgb(0, 143, 148)',
+    borderRadius: 20,
+    borderWidth: 2,
+    justifyContent: 'flex-end',
+    margin: '1%',
+    maxWidth: '50%',
+    textAlign: 'left',
+  },
+  textStyle: {
+    color: 'white',
+    padding: 10,
   },
 
   textInput: {
+    color: 'white',
     height: '100%',
     width: '75%',
   }
