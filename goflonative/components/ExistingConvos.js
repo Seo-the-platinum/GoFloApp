@@ -9,90 +9,115 @@ import {
   View,
 } from 'react-native'
 import { connect } from 'react-redux'
-import { db } from '../utils/firebase'
+import { db, storageRef } from '../utils/firebase'
 
 class ExistingConvos extends Component {
-  state={
-    convosIds:[],
-    sentIds:[],
-    receivedIds: [],
-    lastMessages:[],
+  state= {
+    convos: [],
     convosData: [],
-
+    otherUids: [],
+    messagesData: [],
+    uIds: [],
   }
   componentDidMount() {
-    const { authedUser, users }= this.props
-    if (users[authedUser].messages !== undefined) {
-      if (users[authedUser].messages.sent !== undefined) {
-        const sent= users[authedUser].messages.sent
-        const sIds= Object.keys(sent).map(m=> {
-          return sent[m].id
+    const{ authedUser }= this.props
+    const membersRef= db.ref('members/')
+    membersRef.on('value', snapshot=> {
+      const dbMembers= snapshot.val()
+      if (dbMembers === null) {
+        return null
+      }
+      else {
+        const chats= Object.keys(dbMembers).filter(c=> {
+           return Object.values(dbMembers[c]).includes(authedUser)
+        })
+        const otherIds= chats.map(i=> {
+          const idArr= Object.values(dbMembers[i]).filter(i=> i !== authedUser)
+          return idArr
         })
         this.setState(currState=> ({
           currState,
-          sentIds: sIds,
-        }), ()=> this.fusionHa())
+          convos: chats,
+          otherUids: otherIds
+        }), ()=> {this.getChatData()
+                  this.getUsers()})
       }
-      if (users[authedUser].messages.received !== undefined) {
-        const received= users[authedUser].messages.received
-        const rIds= Object.keys(received).map(m=> {
-          return received[m].id
-        })
-        this.setState(currState=> ({
-          currState,
-          receivedIds: rIds,
-        }), ()=> this.fusionHa())
-      }
-    } else {
-      return;
-    }
+    })
   }
-
-  fusionHa= ()=> {
-    const { receivedIds, sentIds }= this.state
-    const combined= receivedIds.concat(sentIds)
-    const listOfIds= [...new Set(combined)]
-    this.setState(currState=> ({
-      currState,
-      convos: listOfIds,
-    }), ()=> this.latestMessage())
-  }
-
-  latestMessage= ()=> {
-    const { authedUser, users }= this.props
-    const { convos,convosData, lastMessages }= this.state
-    let messagesData= db.ref('messages/')
-    messagesData.on('value', snapshot=> {
-      let dbMessages= snapshot.val()
-      if (dbMessages !== undefined) {
-      const filteredMessages= Object.keys(dbMessages).map(m => {
-        if (dbMessages[m].author === authedUser ||
-          dbMessages[m].recepient === authedUser) {
-            return dbMessages[m]
-          }})
+  getChatData= ()=> {
+    const { convos }= this.state
+    const chatRef= db.ref(`chats/`)
+    chatRef.on('value', snapshot=> {
+      const dbChat= snapshot.val()
+      const list= convos.map(c=> {
+        return dbChat[c]
+      })
       this.setState(currState=> ({
         currState,
-        convosData: filteredMessages,
-      }), ()=> this.finalList())
-      }
-    })
-  }
-
-  finalList= ()=> {
-    const { convosData, lastMessages, sentIds, receivedIds }= this.state
-    let test= convosData.sort((a,b)=> {
-      return b.timeStamp - a.timeStamp
+        convosData: list,
+      }), ()=> this.getMessages())
     })
 
   }
+  getMessages= ()=> {
+    const { convosData, convos }= this.state
+    const messagesRef= db.ref('messages/')
+    messagesRef.on('value', snapshot=> {
+      const dbMessages= snapshot.val()
+      const messagesList= convos.map((o, index)=> {
+        return {
+          message:dbMessages[o],
+          index: index}
+      })
+      const orderedMessages= messagesList.sort((a,b)=> {
+        return b.timeStamp - a.timeStamp
+      })
+      this.setState(currState=> ({
+        currState,
+        messagesData: orderedMessages,
+      }))
+    })
+  }
 
+  getUsers= ()=> {
+    const { otherUids }= this.state
+    const usersRef= db.ref('users/')
+    usersRef.on('value', snapshot=> {
+      const dbUsers= snapshot.val()
+      const usersObjs= otherUids.map(id=> {
+        return dbUsers[id]
+      })
+      this.setState(currState=> ({
+        currState,
+        uIds: usersObjs,
+      }))
+    })
+  }
+
+
+  renderItem=({item}, state)=> (
+    <View style={{
+        borderColor: 'black',
+        borderWidth: 1,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%'}}>
+      <Text> {state.uIds[item.index].displayName}</Text>
+      <Text>{state.convosData[item.index].lastMessage}</Text>
+    </View>
+  )
   render() {
     const { authedUser, users }= this.props
-    const { lastMessages }= this.state
+    const { messagesData, uIds }= this.state
     return (
       <SafeAreaView style={styles.container}>
-        <Text> testing</Text>
-        <FlatList/>
+        <FlatList
+          keyExtractor={item=> item.id}
+          data={messagesData}
+          renderItem={(item)=>this.renderItem(item, this.state)}
+          style={{flex: 1, width: '100%'}}
+         />
       </SafeAreaView>
     )
   }
@@ -100,10 +125,11 @@ class ExistingConvos extends Component {
 
 const styles=StyleSheet.create({
   container: {
-    flex:1,
+    alignItems: 'center',
     borderColor: 'red',
     borderWidth: 2,
-
+    flex: 1,
+    width: '100%',
   }
 })
 
@@ -113,4 +139,5 @@ function mapStateToProps({authedUser, users}) {
     users,
   }
 }
+
 export default connect(mapStateToProps)(ExistingConvos)

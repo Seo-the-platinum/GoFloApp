@@ -140,7 +140,7 @@ class Messages extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <View>
+          <View style={{borderColor: 'red', borderWidth: 3, width: '100%', height: '100%'}}>
             <ExistingConvos/>
           </View>
         </View>
@@ -197,8 +197,9 @@ const styles= StyleSheet.create({
   messagesView: {
     alignItems: 'flex-start',
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
+    margin: '5%',
     width: '100%',
   },
 

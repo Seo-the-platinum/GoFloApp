@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { SearchBar } from 'react-native-elements'
 import { connect } from 'react-redux'
-import { storageRef } from '../utils/firebase'
+import { db, storageRef } from '../utils/firebase'
 import Conversation from './Conversation'
 
 class NewMessage extends Component {
@@ -90,11 +90,28 @@ class NewMessage extends Component {
   }
 
   toMessage= (item)=> {
-    const { navigation, users }= this.props
-    navigation.navigate('Conversation', {
-      uid: item.uid,
-      name: users[item.uid].displayName,
-      url: item.trueUrl,
+    const { authedUser, navigation, users }= this.props
+    let memberRef= db.ref(`members/`)
+    memberRef.on('value', snapshot=> {
+      let dbMembers= snapshot.val()
+      if (dbMembers === null) {
+        navigation.navigate('Conversation', {
+          uid: item.uid,
+          name: users[item.uid].displayName,
+          url: item.trueUrl,
+        })
+      }
+      else {
+        const chat= Object.keys(dbMembers).filter(c=> {
+          return Object.values(dbMembers[c]).includes(authedUser, item.uid)
+        })
+        navigation.navigate('Conversation', {
+          uid: item.uid,
+          name: users[item.uid].displayName,
+          url: item.trueUrl,
+          chat: chat,
+        })
+        }
     })
   }
 

@@ -17,63 +17,35 @@ import { Feather } from '@expo/vector-icons';
 class Conversation extends Component {
   state={
     str: '',
-    messages: null,
     ids: null,
     height: 200,
-    messageTime: null,
-    filteredMessages:[],
     chronoOrder: [],
   }
 
   componentDidMount() {
     const { authedUser, users }= this.props
-    const { uid }= this.props.route.params
-    let messagesRef= db.ref('messages/')
+    const { uid, chat }= this.props.route.params
+    let messagesRef= db.ref('messages/' + chat)
     messagesRef.on('value', snapshot=> {
       if (snapshot === null) {
         return null
       } else {
         let dbMessages= snapshot.val()
         if ( dbMessages !== null) {
-        const filteredMessages= Object.keys(dbMessages).filter(m=> {
-          return (
-            (dbMessages[m].author === authedUser || dbMessages[m].author === uid) &&
-          (dbMessages[m].recepient === authedUser || dbMessages[m].recepient === uid)
-          )
-        })
-        this.setState(currState=> ({
-          currState,
-          messages: dbMessages,
-          ids: filteredMessages,
-        }), ()=> this.buildMessages()
-          )
+          const messageList= Object.keys(dbMessages).map(m=> {
+            return dbMessages[m]
+          })
+          const chronolized= messageList.sort((a,b)=> {
+            return b.timeStamp - a.timeStamp
+          })
+          this.setState(currState=> ({
+            currState,
+            chronoOrder: chronolized,
+          }))
         }
       }
     })
   }
-
-
-buildMessages= ()=> {
-    const { ids, messages }= this.state
-    const loop= ids.map(id=> {
-      return messages[id]
-    })
-    this.setState(currState=> ({
-      currState,
-      filteredMessages: loop,
-    }), ()=>this.chronoMessages())
-}
-
-chronoMessages= ()=> {
-  const { filteredMessages }= this.state
-  const chronoList=filteredMessages.sort((a,b)=> {
-    return a.timeStamp - b.timeStamp
-  }).reverse()
-  this.setState(currState=> ({
-    currState,
-    chronoOrder: chronoList,
-  }))
-}
 
   updateSize= (height)=> {
     this.setState(currState=> ({
@@ -83,22 +55,41 @@ chronoMessages= ()=> {
   }
 
   sendMessage=()=> {
-    const { messages, amOrPm }= this.state
     const{ authedUser, users }= this.props
-    const chat= `${users[authedUser].displayName}/${users[this.props.route.params.uid].displayName}`
+    const { chat, uid }= this.props.route.params
     const data= this.createMessage()
+    if ( chat === undefined ) {
+      const newChat= `${users[authedUser].displayName}&${users[this.props.route.params.uid].displayName}`
+      db.ref('chats/' + newChat).set({
+        lastMessage: data.text,
+        timeStamp: data.timeStamp,
+        mId: data.id,
+      })
 
-    db.ref('messages/'+ data.id).set(
+      db.ref('members/' + newChat).set({
+        member1: authedUser,
+        member2: uid,
+      }
+      )
+
+      db.ref('messages/' + newChat + '/' + data.id).set(
+        data
+      )
+    }
+    else {
+    db.ref(`messages/${chat}/${data.id}`).set(
        data
     )
-    db.ref('users/'+ users[authedUser].uid+'/messages/'+ data.id).set({
-      id:data.id,
-      recepient:data.recepient,
+    db.ref(`chats/${chat}`).set({
+      lastMessage: data.text,
+      timeStamp: data.timeStamp,
+      mId: data.id,
     })
-    db.ref('users/' + data.recepient + '/messages/'+ data.id).set({
-      id:data.id,
-      author:data.author,
+    db.ref(`members/${chat}`).set({
+      member1: authedUser,
+      member2: uid,
     })
+    }
     this.setState(currState=> ({
       currState,
       str: ''
@@ -122,6 +113,7 @@ chronoMessages= ()=> {
       return `${hours}:${mins}Am`
     }
   }
+
   createMessage= ()=> {
     const { str }= this.state
     const { authedUser, users }= this.props
@@ -170,7 +162,7 @@ chronoMessages= ()=> {
   render() {
     const { displayName, authedUser }= this.props
     const { name, url, uid }= this.props.route.params
-    const { filteredMessages, str }= this.state
+    const { chronoOrder, str }= this.state
     let height= this.state.height
 
     return (
@@ -182,7 +174,7 @@ chronoMessages= ()=> {
         <SafeAreaView style={styles.messageThread}>
           <View style={{flex: 1}}>
             <FlatList
-              data={filteredMessages}
+              data={chronoOrder}
               renderItem={this.renderMessages}
               keyExtractor={item=> item.id}
               inverted
