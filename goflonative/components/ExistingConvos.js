@@ -18,6 +18,7 @@ class ExistingConvos extends Component {
     otherUids: [],
     messagesData: [],
     uIds: [],
+    itemsList: null,
   }
   componentDidMount() {
     const{ authedUser }= this.props
@@ -31,16 +32,21 @@ class ExistingConvos extends Component {
         const chats= Object.keys(dbMembers).filter(c=> {
            return Object.values(dbMembers[c]).includes(authedUser)
         })
+
         const otherIds= chats.map(i=> {
-          const idArr= Object.values(dbMembers[i]).filter(i=> i !== authedUser)
-          return idArr
+          if (dbMembers[i].member1 === authedUser) {
+            return dbMembers[i].member2
+          } else {
+            return dbMembers[i].member1
+          }
         })
+
         this.setState(currState=> ({
           currState,
           convos: chats,
           otherUids: otherIds
-        }), ()=> {this.getChatData()
-                  this.getUsers()})
+        }), ()=> this.getChatData()
+        )
       }
     })
   }
@@ -64,10 +70,8 @@ class ExistingConvos extends Component {
     const messagesRef= db.ref('messages/')
     messagesRef.on('value', snapshot=> {
       const dbMessages= snapshot.val()
-      const messagesList= convos.map((o, index)=> {
-        return {
-          message:dbMessages[o],
-          index: index}
+      const messagesList= convos.map(o=> {
+        return dbMessages[o]
       })
       const orderedMessages= messagesList.sort((a,b)=> {
         return b.timeStamp - a.timeStamp
@@ -75,7 +79,7 @@ class ExistingConvos extends Component {
       this.setState(currState=> ({
         currState,
         messagesData: orderedMessages,
-      }))
+      }), ()=> this.getUsers())
     })
   }
 
@@ -90,32 +94,79 @@ class ExistingConvos extends Component {
       this.setState(currState=> ({
         currState,
         uIds: usersObjs,
+      }), ()=> this.buildObj())
+    })
+  }
+
+  buildObj= async ()=> {
+    const { convosData, messagesData, uIds, convos }= this.state
+    const promises= convosData.map((c, index)=> {
+      const displayName= uIds[index].displayName
+      const url= uIds[index].profilePic.imgName
+      const txt= c.lastMessage
+      const uid= uIds[index].uid
+      const chat= convos[index]
+      const fireSource= storageRef.child(`images/${url}`)
+      return fireSource.getDownloadURL().then(url => {
+        return {
+          displayName,
+          trueUrl: url,
+          uid,
+          txt,
+          chat,
+        }
+      })
+    })
+    await Promise.all(promises).then((res)=> {
+      this.setState(currState=> ({
+        currState,
+        itemsList: res,
       }))
     })
   }
 
+  toMessage=(item)=> {
+    const { navigation }= this.props
+    navigation.navigate('Conversation', {
+      uid: item.uid,
+      name: item.displayName,
+      url: item.trueUrl,
+      chat: item.chat,
+    })
+  }
 
-  renderItem=({item}, state)=> (
-    <View style={{
-        borderColor: 'black',
-        borderWidth: 1,
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%'}}>
-      <Text> {state.uIds[item.index].displayName}</Text>
-      <Text>{state.convosData[item.index].lastMessage}</Text>
-    </View>
+  renderItem=({item})=> (
+    <TouchableOpacity
+      onPress={()=> this.toMessage(item)}
+      style={styles.itemContainer}>
+      <View style={styles.imgContainer}>
+        <Image
+          source={{uri: item.trueUrl}}
+          style={styles.thumbImg}
+        />
+      </View>
+      <View style={styles.textView}>
+        <Text
+          style={styles.itemDisplayName}
+         >
+          {item.displayName}
+        </Text>
+        <Text
+          style={styles.itemTxt}>
+           {item.txt}
+        </Text>
+      </View>
+    </TouchableOpacity>
   )
   render() {
     const { authedUser, users }= this.props
-    const { messagesData, uIds }= this.state
+    const { itemsList, doneLoading }= this.state
     return (
       <SafeAreaView style={styles.container}>
         <FlatList
-          keyExtractor={item=> item.id}
-          data={messagesData}
-          renderItem={(item)=>this.renderItem(item, this.state)}
+          keyExtractor={(item)=> {return item.uid}}
+          data={itemsList}
+          renderItem={(item)=> this.renderItem(item)}
           style={{flex: 1, width: '100%'}}
          />
       </SafeAreaView>
@@ -126,11 +177,43 @@ class ExistingConvos extends Component {
 const styles=StyleSheet.create({
   container: {
     alignItems: 'center',
-    borderColor: 'red',
-    borderWidth: 2,
     flex: 1,
     width: '100%',
-  }
+  },
+
+  imgContainer: {
+    alignItems: 'flex-end',
+    marginBottom: '2%',
+    marginRight: '5%',
+    width: '15%',
+  },
+
+  itemContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+
+  itemDisplayName: {
+    fontSize: 24,
+  },
+
+  itemTxt: {
+    fontSize: 12,
+  },
+
+  textView: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    flex: 1,
+  },
+
+  thumbImg: {
+    borderRadius: 40,
+    height: 50,
+    width: 50,
+  },
 })
 
 function mapStateToProps({authedUser, users}) {

@@ -102,9 +102,10 @@ class NewMessage extends Component {
         })
       }
       else {
-        const chat= Object.keys(dbMembers).filter(c=> {
+        const chat= Object.keys(dbMembers).map(c=> {
           return Object.values(dbMembers[c]).includes(authedUser, item.uid)
         })
+        console.log('chat is here', chat)
         navigation.navigate('Conversation', {
           uid: item.uid,
           name: users[item.uid].displayName,

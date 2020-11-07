@@ -140,8 +140,10 @@ class Messages extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={{borderColor: 'red', borderWidth: 3, width: '100%', height: '100%'}}>
-            <ExistingConvos/>
+          <View style={{
+            height: '100%',
+            width: '100%'}}>
+            <ExistingConvos navigation={this.props.navigation}/>
           </View>
         </View>
       </View>
@@ -163,6 +165,7 @@ const styles= StyleSheet.create({
 
   container: {
     alignItems: 'center',
+    backgroundColor:'rgb(53, 75, 79)',
     flex: 1,
   },
 

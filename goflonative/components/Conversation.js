@@ -220,7 +220,7 @@ class Conversation extends Component {
 
 const styles= StyleSheet.create({
   container: {
-    backgroundColor: 'gray',
+    backgroundColor: 'rgb(53, 75, 79)',
     flex: 1,
     justifyContent: 'flex-end',
   },
@@ -237,7 +237,7 @@ const styles= StyleSheet.create({
   },
 
   messageThread: {
-    backgroundColor: 'gray',
+    backgroundColor: 'rgb(53, 75, 79)',
     flex: 5,
   },
 
