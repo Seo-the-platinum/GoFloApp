@@ -91,6 +91,7 @@ class NewMessage extends Component {
 
   toMessage= (item)=> {
     const { authedUser, navigation, users }= this.props
+    console.log('authedUser and uid', authedUser, item.uid)
     let memberRef= db.ref(`members/`)
     memberRef.on('value', snapshot=> {
       let dbMembers= snapshot.val()
@@ -102,17 +103,28 @@ class NewMessage extends Component {
         })
       }
       else {
-        const chat= Object.keys(dbMembers).map(c=> {
-          return Object.values(dbMembers[c]).includes(authedUser, item.uid)
+        const chat= Object.keys(dbMembers).filter(c=> {
+          const keyList= Object.values(dbMembers[c])
+          if (keyList.includes(authedUser) && keyList.includes(item.uid)){
+            return c
+          }
         })
-        console.log('chat is here', chat)
-        navigation.navigate('Conversation', {
-          uid: item.uid,
-          name: users[item.uid].displayName,
-          url: item.trueUrl,
-          chat: chat,
-        })
+        console.log('chat here after map', chat)
+        if (chat[0] !== undefined) {
+          navigation.navigate('Conversation', {
+            uid: item.uid,
+            name: users[item.uid].displayName,
+            url: item.trueUrl,
+            chat: chat,
+          })
+        } else {
+          navigation.navigate('Conversation', {
+            uid: item.uid,
+            name: users[item.uid].displayName,
+            url: item.trueUrl,
+          })
         }
+      }
     })
   }
 
@@ -132,6 +144,7 @@ class NewMessage extends Component {
 
   render() {
     const { search, filteredData }= this.state
+    console.log('filteredData here', filteredData)
     return (
       <View>
         <SearchBar

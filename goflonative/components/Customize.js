@@ -96,14 +96,7 @@ class Customize extends Component {
       imgUri: result.uri,
     }))
   }
-/*
-  handleDisplayName= (text)=> {
-    this.setState(currState=> ({
-      currState,
-      display: text,
-    }))
-  }
-*/
+
   handleArtistName= (text)=> {
     this.setState(currState=> ({
       currState,
@@ -137,7 +130,6 @@ class Customize extends Component {
       await locRef.put(blob)
     }
     this.setProfilePic(imgName)
-    //this.setDisplayName(display)
     this.setArtistName(artist)
     this.setArtistAbout(about)
     this.setArtistsInfluences()
@@ -149,16 +141,7 @@ class Customize extends Component {
      imgName,
      }, ()=> dispatch(updateProfilePic(authedUser, imgName)))
    }
-/*
-  setDisplayName= async (display)=> {
-    const { authedUser, dispatch, users }= this.props
-    const user= auth.currentUser
-    await user.updateProfile({
-      displayName: display,
-    }).then(()=> console.log(`display name has been update to ${display}`))
-    .catch((error)=> console.log('setDisplayName error:',error))
-  }
-*/
+
   setArtistName= async (artist)=> {
     const { authedUser, dispatch, users }= this.props
     await db.ref(`users/${authedUser}/`).update({
@@ -217,75 +200,84 @@ class Customize extends Component {
     if ( loading === false ) {
     return (
       <DismissKeyboard>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding': 'height'}
-        style={styles.container}>
-        <View>
-        <View style={styles.imageButtonContainer}>
-        <Image
-          source={{uri:imgUri}}
-          style={styles.img}/>
-          <TouchableOpacity
-            title="Upload profile image"
-            onPress={this.pickImage}
-            style={styles.imageButton}>
-            <Text style={{color: 'white'}}> Upload Image </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.artistContainer}>
-          <TextInput
-            maxLength={20}
-            onChangeText= {(text)=>this.handleArtistName(text)}
-            placeholder='Enter Artist Name'
-            placeholderTextColor= 'white'
-            value={artist}
-            style={styles.artistInput}
-          />
-        </View>
-        <View style={styles.artistAboutContainer}>
-          <TextInput
-            maxLength={200}
-            multiline={true}
-            onChangeText= {(text)=>this.handleAbout(text)}
-            placeholder='Enter About'
-            placeholderTextColor= 'white'
-            value={about}
-            style={styles.aboutInput}
-          />
-        </View>
-        <View style={styles.artistInfluences}>
-          <TextInput
-            maxLength={20}
-            onChangeText={text=> this.handleArtistInfluence1(text)}
-            placeholder='Enter musical influence...'
-            placeholderTextColor= 'white'
-            style={styles.influence1}
-            value={influence1}/>
-          <TextInput
-            maxLength={20}
-            onChangeText={text=> this.handleArtistInfluence2(text)}
-            placeholder='Enter musical influence...'
-            placeholderTextColor= 'white'
-            style={styles.influence2}
-            value={influence2}/>
-          <TextInput
-            maxLength={20}
-            onChangeText={text=> this.handleArtistInfluence3(text)}
-            placeholder='Enter musical influence...'
-            placeholderTextColor= 'white'
-            style={styles.influence3}
-            value={influence3}/>
-        </View>
-        </View>
-        <View style= {styles.saveContainer}>
-          <TouchableOpacity onPress={this.saveSettings}>
-            <Text style={styles.saveBtn}>
-              Save
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding': 'height'}
+          style={styles.container}>
+          <View style={{flex: 1, padding: '2%', width: '75%'}}>
+            <View style={styles.imgContainer}>
+            <Image
+              source={{uri:imgUri}}
+              style={styles.img}
+              resizeMode= 'contain'/>
+              <View style={styles.imageButtonContainer}>
+                <TouchableOpacity
+                  title="Upload profile image"
+                  onPress={this.pickImage}
+                  style={styles.imageButton}>
+                  <Text style={{
+                    color: 'white'}}
+                  > Upload Image
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.midSec}>
+              <View style={styles.artistAboutContainer}>
+                <View style={styles.artistContainer}>
+                  <TextInput
+                    maxLength={20}
+                    onChangeText= {(text)=>this.handleArtistName(text)}
+                    placeholder='Enter Artist Name'
+                    placeholderTextColor= 'white'
+                    value={artist}
+                    style={styles.artistInput}
+                  />
+                </View>
+                <TextInput
+                  maxLength={200}
+                  multiline={true}
+                  onChangeText= {(text)=>this.handleAbout(text)}
+                  placeholder='Enter About'
+                  placeholderTextColor= 'white'
+                  value={about}
+                  style={styles.aboutInput}
+                />
+              </View>
+            </View>
+            <View style={styles.bottomSec}>
+              <View style={styles.artistInfluences}>
+                <TextInput
+                  maxLength={12}
+                  onChangeText={text=> this.handleArtistInfluence1(text)}
+                  placeholder='Enter musical influence'
+                  placeholderTextColor= 'white'
+                  style={styles.influence1}
+                  value={influence1}/>
+                <TextInput
+                  maxLength={12}
+                  onChangeText={text=> this.handleArtistInfluence2(text)}
+                  placeholder='Enter musical influence'
+                  placeholderTextColor= 'white'
+                  style={styles.influence2}
+                  value={influence2}/>
+                <TextInput
+                  maxLength={12}
+                  onChangeText={text=> this.handleArtistInfluence3(text)}
+                  placeholder='Enter musical influence'
+                  placeholderTextColor= 'white'
+                  style={styles.influence3}
+                  value={influence3}/>
+              </View>
+              <View style= {styles.saveContainer}>
+                <TouchableOpacity onPress={this.saveSettings}>
+                  <Text style={styles.saveBtn}>
+                    Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
       </DismissKeyboard>
     )
   } else {
@@ -297,120 +289,133 @@ class Customize extends Component {
 }
 
 styles= StyleSheet.create({
+
   artistContainer: {
     alignItems: 'center',
-    height: '10%',
-    width: '50%',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
+    borderRadius: 10,
+    borderWidth: 2,
+    flex: .5,
+    width: '80%',
   },
 
   artistAboutContainer: {
     alignItems: 'center',
-    height: '10%',
-    width: '50%',
+    flex: 1,
+    justifyContent: 'center',
   },
+
   artistInfluences: {
     alignItems: 'center',
-    height: '10%',
-    width: '50%',
+    flex: 1,
   },
 
   artistInput: {
-    borderColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
     color: 'white',
-    height: '75%',
+    height: '100%',
     textAlign: 'center',
+    justifyContent: 'center',
     width: '100%',
   },
 
   aboutInput: {
-    borderColor: 'white',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     color: 'white',
-    height: '75%',
-    textAlign: 'center',
+    height: '50%',
+    marginTop: '4%',
+    justifyContent: 'center',
+    textAlign: 'left',
     width: '100%',
   },
 
-  container: {
-    backgroundColor: 'gray',
-    flex: 1,
+  bottomSec: {
+    flex: .5,
     justifyContent: 'flex-start',
   },
 
-  displayNameContainer: {
+  container: {
     alignItems: 'center',
-    height: '10%',
-    marginTop: '5%',
-    width: '50%',
-  },
-
-  displayNameInput: {
-    borderColor: 'white',
-    borderRadius: 10,
-    borderWidth: 1,
-    color: 'white',
-    height: '75%',
-    textAlign: 'center',
+    backgroundColor: 'gray',
+    flex: 1,
     width: '100%',
   },
 
-  header: {
-    borderBottomWidth: 2,
-    alignItems: 'center',
-  },
   img: {
-    width: '50%',
-    height: '75%',
+    height: '80%',
+    width: '100%',
+  },
+
+  imgContainer: {
+    alignItems: 'center',
+    flex: .5,
   },
 
   imageButton: {
     alignItems: 'center',
-    borderColor: 'white',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
     borderRadius: 10,
-    borderWidth: 1,
-    height: '17%',
+    borderWidth: 2,
+    height: '60%',
     justifyContent: 'center',
-    width: '50%',
+    width: '80%',
   },
 
   imageButtonContainer: {
-    height: '35%',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
     width: '100%',
   },
 
   influence1: {
-    borderColor: 'white',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     color: 'white',
+    flex: .25,
     height: '75%',
+    margin: '2%',
     textAlign: 'center',
     width: '100%',
   },
 
   influence2: {
-    borderColor: 'white',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     color: 'white',
+    flex: .25,
     height: '75%',
+    margin: '2%',
     textAlign: 'center',
     width: '100%',
   },
 
   influence3: {
-    borderColor: 'white',
+    backgroundColor: 'rgb(1, 125, 86)',
+    borderColor: 'black',
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     color: 'white',
+    flex: .25,
     height: '75%',
+    margin: '2%',
     textAlign: 'center',
     width: '100%',
   },
+
+  midSec: {
+    flex: .25,
+    justifyContent: 'center',
+  },
+
   saveBtn: {
     color: 'white',
     fontSize: 18,
@@ -422,9 +427,9 @@ styles= StyleSheet.create({
     borderColor: 'black',
     borderRadius: 10,
     borderWidth: 1,
-    height: '5%',
+    flex: .25,
     justifyContent: 'center',
-    width: '50%',
+    width: '100%',
   }
 })
 

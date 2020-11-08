@@ -13,11 +13,9 @@ export default function MessagesStack({navigation}) {
     <Stack.Navigator
       screenOptions={{
         headerShown: true,
-
         headerStyle: {
           backgroundColor: 'black',
         },
-
         headerTitleStyle: {
           color: 'white',
         },

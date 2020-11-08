@@ -52,6 +52,7 @@ export default function ProfileStack(){
           options={{
             headerBackTitleVisible: false,
             headerTintColor: 'rgb(0, 117, 88)',
+            headerShown: false,
           }}/>
         <Stack.Screen
           name='Customize'

@@ -25,6 +25,7 @@ class Conversation extends Component {
   componentDidMount() {
     const { authedUser, users }= this.props
     const { uid, chat }= this.props.route.params
+    if (chat !== undefined) {
     let messagesRef= db.ref('messages/' + chat)
     messagesRef.on('value', snapshot=> {
       if (snapshot === null) {
@@ -45,6 +46,7 @@ class Conversation extends Component {
         }
       }
     })
+   }
   }
 
   updateSize= (height)=> {
@@ -59,7 +61,7 @@ class Conversation extends Component {
     const { chat, uid }= this.props.route.params
     const data= this.createMessage()
     if ( chat === undefined ) {
-      const newChat= `${users[authedUser].displayName}&${users[this.props.route.params.uid].displayName}`
+      const newChat= `${users[authedUser].displayName}&${users[uid].displayName}`
       db.ref('chats/' + newChat).set({
         lastMessage: data.text,
         timeStamp: data.timeStamp,
@@ -69,8 +71,7 @@ class Conversation extends Component {
       db.ref('members/' + newChat).set({
         member1: authedUser,
         member2: uid,
-      }
-      )
+      })
 
       db.ref('messages/' + newChat + '/' + data.id).set(
         data

@@ -115,7 +115,6 @@ class TrackPlayer extends Component {
   }
 
   _updateScreenForSoundStatus = (status) => {
-    console.log('volume status here!', status.volume)
     this.setState(currState=> ({
       ...currState,
       currentMillis: status.positionMillis,
@@ -137,16 +136,12 @@ class TrackPlayer extends Component {
   _pauseAndPlayRecording= async ()=> {
     if ( this.sound != null) {
       if (this.state.playingStatus == 'playing') {
-        console.log('pausing...')
         await this.sound.pauseAsync();
-        console.log('paused')
         this.setState(currState=> ({
           playingStatus: 'donepause'
         }));
       } else {
-        console.log('playing...')
         await this.sound.playAsync();
-        console.log('playing')
         this.setState({
           playingStatus: 'playing',
         })
@@ -158,9 +153,7 @@ class TrackPlayer extends Component {
     const { index, playList, playingStatus }= this.state
 
     if ( playingStatus === 'playing') {
-      console.log('stopping...')
       await this.sound.stopAsync();
-      console.log('stopped')
       this.setState(currState=> ({
         playingStatus: 'nosound',
       }), ()=> this._increaseIndex())
@@ -186,16 +179,13 @@ class TrackPlayer extends Component {
       }), ()=>this._playRecording())
     }
     dispatch(setSelectedTrack(users[authedUser].tracks[tracks[index]].source))
-
   }
 
   _prevTrack= async ()=> {
   const { index, playList, playingStatus }= this.state
 
   if ( playingStatus === 'playing') {
-    console.log('stopping...')
     await this.sound.stopAsync();
-    console.log('stopped')
     this.setState(currState=> ({
       playingStatus: 'nosound',
     }), ()=> {
