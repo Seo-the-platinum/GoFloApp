@@ -28,6 +28,8 @@ const DismissKeyboard= ({ children })=> (
   </TouchableWithoutFeedback>
 )
 
+let _isMounted= false
+
 class Customize extends Component {
 
   state= {
@@ -42,30 +44,41 @@ class Customize extends Component {
   }
 
   async componentDidMount() {
-    const { authedUser, users }= this.props
-    if ( Constants.platform.ios) {
-      const { status }= await ImagePicker.requestCameraRollPermissionsAsync()
-      if ( status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work')
+     _isMounted= true
+    if (_isMounted) {
+      const { authedUser, users }= this.props
+      if ( Constants.platform.ios) {
+        const { status }= await ImagePicker.requestCameraRollPermissionsAsync()
+        if ( status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work')
+        }
       }
-    }
-    if ( users[authedUser].profilePic !== undefined ) {
-      await this.getUri()
-    } else {
-      await this.getDefaultUri()
+      console.log('within didMount', _isMounted)
+      if ( users[authedUser].profilePic !== undefined ) {
+        await this.getUri()
+      } else {
+        await this.getDefaultUri()
+      }
     }
   }
 
+  componentWillUnmount () {
+    _isMounted= false
+  }
+
   getUri= ()=> {
+    console.log('start of getUri',_isMounted)
     const { authedUser, users }= this.props
     const fireSource= storageRef.child(`images/${users[authedUser].profilePic.imgName}`)
     return fireSource.getDownloadURL().then((url)=> {
-      this.setState(currState=> ({
-        imgUri: url,
-        loading: false,
-        about: users[authedUser].artistAbout,
-        artist: users[authedUser].artistName,
-      }), ()=> console.log('users img', url))
+      if ( _isMounted ) {
+        this.setState(currState=> ({
+          imgUri: url,
+          loading: false,
+          about: users[authedUser].artistAbout,
+          artist: users[authedUser].artistName,
+        }))
+      }
     })
   }
 
@@ -73,12 +86,14 @@ class Customize extends Component {
     const { authedUser, users }= this.props
     const fireSource= storageRef.child('images/defaultUserpic.jpg')
     return fireSource.getDownloadURL().then((url)=> {
-      this.setState(currState=> ({
-        imgUri: url,
-        loading: false,
-        about: users[authedUser].artistAbout,
-        artist: users[authedUser].artistName,
-      }))
+      if (_isMounted) {
+        this.setState(currState=> ({
+          imgUri: url,
+          loading: false,
+          about: users[authedUser].artistAbout,
+          artist: users[authedUser].artistName,
+        }))
+      }
     })
   }
 
@@ -188,6 +203,7 @@ class Customize extends Component {
     }))
   }
   render() {
+
     const {
       about,
       artist,
@@ -197,6 +213,7 @@ class Customize extends Component {
       influence2,
       influence3,
       loading, }= this.state
+
     if ( loading === false ) {
     return (
       <DismissKeyboard>

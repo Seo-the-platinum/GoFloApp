@@ -32,12 +32,14 @@ class TrackPlayer extends Component {
     }
   }
 
-  componentWillUnmount() {
+ async componentWillUnmount() {
     const { playingStatus }= this.state
-    if ( playingStatus !== 'nosound') {
-      this.sound.stopAsync()
-    }
     _isMounted= false
+    console.log('going to unMount', _isMounted)
+    if ( playingStatus !== 'nosound') {
+      console.log('track player', _isMounted)
+      await this.sound.stopAsync()
+    }
   }
 
    _buildSongsObj= async ()=> {
@@ -45,7 +47,7 @@ class TrackPlayer extends Component {
        const promises= tracks.map(s=> {
        const fireSource= storageRef.child(users[authedUser].tracks[s].source)
        return fireSource.getDownloadURL().then((url)=> {
-         return {
+        return {
            producer: users[authedUser].tracks[s].producer,
            source: url,
            title: users[authedUser].tracks[s].title,
@@ -53,10 +55,12 @@ class TrackPlayer extends Component {
       })
    })
     await Promise.all(promises).then((res)=> {
-       this.setState(currState=> ({
-         ...currState,
-         playList: res,
-       }))
+      if (_isMounted) {
+         this.setState(currState=> ({
+           ...currState,
+           playList: res,
+         }))
+       }
      })
   }
 
@@ -108,28 +112,31 @@ class TrackPlayer extends Component {
     );
     this.sound= sound
     // updates state to show that sound is playing
-    this.setState(currState=> ({
-      playingStatus: 'playing',
-    }))
+    if (_isMounted) {
+      this.setState(currState=> ({
+        playingStatus: 'playing',
+      }))
+    }
     dispatch(setSelectedTrack(users[authedUser].tracks[tracks[index]].source))
   }
 
   _updateScreenForSoundStatus = (status) => {
-    this.setState(currState=> ({
-      ...currState,
-      currentMillis: status.positionMillis,
-      totalMillis: status.durationMillis,
-    }), ()=> this.buildTimer())
+    if (_isMounted) {
+      this.setState(currState=> ({
+        ...currState,
+        currentMillis: status.positionMillis,
+        totalMillis: status.durationMillis,
+      }), ()=> this.buildTimer())
 
-
-    /*if audio.sound.status.isPlaying is true and playingStatus
-    does not equal playing, the setstate to playing */
-    if (status.isPlaying && this.state.playingStatus !== "playing") {
-      this.setState({ playingStatus: "playing" });
-      /* if isPlaying is not true and playingstatus is playingStatus
-      change state to donepause*/
-    } else if (!status.isPlaying && this.state.playingStatus === "playing") {
-      this.setState({ playingStatus: "donepause" });
+      /*if audio.sound.status.isPlaying is true and playingStatus
+      does not equal playing, the setstate to playing */
+      if (status.isPlaying && this.state.playingStatus !== "playing") {
+        this.setState({ playingStatus: "playing" });
+        /* if isPlaying is not true and playingstatus is playingStatus
+        change state to donepause*/
+      } else if (!status.isPlaying && this.state.playingStatus === "playing") {
+        this.setState({ playingStatus: "donepause" });
+      }
     }
   };
 
@@ -137,14 +144,18 @@ class TrackPlayer extends Component {
     if ( this.sound != null) {
       if (this.state.playingStatus == 'playing') {
         await this.sound.pauseAsync();
-        this.setState(currState=> ({
-          playingStatus: 'donepause'
-        }));
+        if (_isMounted) {
+            this.setState(currState=> ({
+              playingStatus: 'donepause'
+            }))
+        }
       } else {
-        await this.sound.playAsync();
-        this.setState({
-          playingStatus: 'playing',
-        })
+        if (_isMounted) {
+          await this.sound.playAsync();
+          this.setState({
+            playingStatus: 'playing',
+          })
+        }
       }
     }
   }
@@ -154,10 +165,12 @@ class TrackPlayer extends Component {
 
     if ( playingStatus === 'playing') {
       await this.sound.stopAsync();
-      this.setState(currState=> ({
-        playingStatus: 'nosound',
-      }), ()=> this._increaseIndex())
-  }
+      if (_isMounted) {
+        this.setState(currState=> ({
+          playingStatus: 'nosound',
+        }), ()=> this._increaseIndex())
+      }
+    }
   if ( playingStatus === 'nosound' || playingStatus === 'donepause') {
     this._increaseIndex()
   }
@@ -186,16 +199,17 @@ class TrackPlayer extends Component {
 
   if ( playingStatus === 'playing') {
     await this.sound.stopAsync();
-    this.setState(currState=> ({
-      playingStatus: 'nosound',
-    }), ()=> {
-      this._decreaseIndex()
-    })
+    if (_isMounted) {
+      this.setState(currState=> ({
+        playingStatus: 'nosound',
+      }), ()=> {
+        this._decreaseIndex()
+      })
+    }
   }
   if ( playingStatus === 'nosound' || playingStatus === 'donepause') {
     this._decreaseIndex()
   }
-
 }
 
   _decreaseIndex= ()=> {

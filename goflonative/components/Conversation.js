@@ -14,6 +14,8 @@ import { db } from '../utils/firebase'
 import { connect } from 'react-redux'
 import { Feather } from '@expo/vector-icons';
 
+let _isMounted= false
+
 class Conversation extends Component {
   state={
     str: '',
@@ -23,30 +25,39 @@ class Conversation extends Component {
   }
 
   componentDidMount() {
+    _isMounted= true
     const { authedUser, users }= this.props
-    const { uid, chat }= this.props.route.params
+    const { chat, uid }= this.props.route.params
+    console.log('chat here in did mount', chat)
     if (chat !== undefined) {
-    let messagesRef= db.ref('messages/' + chat)
-    messagesRef.on('value', snapshot=> {
-      if (snapshot === null) {
-        return null
-      } else {
-        let dbMessages= snapshot.val()
-        if ( dbMessages !== null) {
-          const messageList= Object.keys(dbMessages).map(m=> {
-            return dbMessages[m]
-          })
-          const chronolized= messageList.sort((a,b)=> {
-            return b.timeStamp - a.timeStamp
-          })
-          this.setState(currState=> ({
-            currState,
-            chronoOrder: chronolized,
-          }))
+      let messagesRef= db.ref('messages/' + chat)
+      messagesRef.on('value', snapshot=> {
+        if (snapshot === null) {
+          return null
+        } else {
+          let dbMessages= snapshot.val()
+          if ( dbMessages !== null) {
+            const messageList= Object.keys(dbMessages).map(m=> {
+              return dbMessages[m]
+            })
+            const chronolized= messageList.sort((a,b)=> {
+              return b.timeStamp - a.timeStamp
+            })
+            this.setState(currState=> ({
+              currState,
+              chronoOrder: chronolized,
+            }))
+          }
         }
-      }
-    })
-   }
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    _isMounted= false
+    const { chat }= this.props.route.params
+    let messagesRef= db.ref(`/messages/${chat}`)
+    messagesRef.off()
   }
 
   updateSize= (height)=> {
@@ -62,6 +73,7 @@ class Conversation extends Component {
     const data= this.createMessage()
     if ( chat === undefined ) {
       const newChat= `${users[authedUser].displayName}&${users[uid].displayName}`
+
       db.ref('chats/' + newChat).set({
         lastMessage: data.text,
         timeStamp: data.timeStamp,
@@ -91,6 +103,7 @@ class Conversation extends Component {
       member2: uid,
     })
     }
+
     this.setState(currState=> ({
       currState,
       str: ''
@@ -165,7 +178,6 @@ class Conversation extends Component {
     const { name, url, uid }= this.props.route.params
     const { chronoOrder, str }= this.state
     let height= this.state.height
-
     return (
       <KeyboardAvoidingView
         behavior={ Platform.OS === 'ios' ? 'padding': 'height'}

@@ -11,7 +11,9 @@ import {
 import { connect } from 'react-redux'
 import { db, storageRef } from '../utils/firebase'
 
+
 class ExistingConvos extends Component {
+
   state= {
     convos: [],
     convosData: [],
@@ -20,6 +22,7 @@ class ExistingConvos extends Component {
     uIds: [],
     itemsList: null,
   }
+
   componentDidMount() {
     const{ authedUser }= this.props
     const membersRef= db.ref('members/')
@@ -50,6 +53,19 @@ class ExistingConvos extends Component {
       }
     })
   }
+
+  componentWillUnmount() {
+    const membersRef= db.ref('members/')
+    const chatRef= db.ref('chats/')
+    const messagesRef= db.ref('/messages')
+    const usersRef= db.ref('/users')
+
+    membersRef.off()
+    chatRef.off()
+    messagesRef.off()
+    usersRef.off()
+  }
+
   getChatData= ()=> {
     const { convos }= this.state
     const chatRef= db.ref(`chats/`)

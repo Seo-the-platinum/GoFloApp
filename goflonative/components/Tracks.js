@@ -10,8 +10,6 @@ import TrackPlayer from './TrackPlayer'
 import Record from './Record'
 import { fireStore } from '../utils/firebase'
 
-
-
 class Tracks extends Component {
   render() {
     const { authedUser, users }= this.props

@@ -1,14 +1,24 @@
 import React, { Component } from 'react'
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View } from 'react-native'
 import { AntDesign, Entypo, MaterialIcons } from '@expo/vector-icons'
 import { auth, db } from '../utils/firebase'
 import { connect } from 'react-redux'
 import { setAuthedUser } from '../actions/authedUser'
+
+const DismissKeyboard= ({ children })=> (
+  <TouchableWithoutFeedback
+    onPress={()=> Keyboard.dismiss()}>
+    {children}
+  </TouchableWithoutFeedback>
+)
 
 class SignUpPage extends Component {
   state={
@@ -108,64 +118,68 @@ class SignUpPage extends Component {
             taken, }= this.state
 
     return (
-      <View style={styles.container}>
-        <View style={styles.inputArea}>
-          <View style={styles.emailArea}>
-            <TextInput
-              style={styles.email}
-              value={email}
-              onChangeText={(text)=> this.handleUser(text)}/>
-            <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
-              <MaterialIcons name='email' size={24} color='white'/>
-              <Text style={{color: 'white', flex: 1, fontSize: 24}}> Email</Text>
+      <DismissKeyboard>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding': 'height '}
+          style={styles.container}>
+          <View style={styles.inputArea}>
+            <View style={styles.emailArea}>
+              <TextInput
+                style={styles.email}
+                value={email}
+                onChangeText={(text)=> this.handleUser(text)}/>
+              <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
+                <MaterialIcons name='email' size={24} color='white'/>
+                <Text style={{color: 'white', flex: 1, fontSize: 24}}> Email</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.passwordArea}>
-            <TextInput
-              style={styles.password}
-              value={password}
-              onChangeText={(text)=> this.handlePassword(text)}
-              secureTextEntry={true}/>
-            <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
-              <Entypo name='key' size={24} color='white'/>
-              <Text style={{color: 'white', flex: 1, fontSize: 24}}> Password</Text>
+            <View style={styles.passwordArea}>
+              <TextInput
+                style={styles.password}
+                value={password}
+                onChangeText={(text)=> this.handlePassword(text)}
+                secureTextEntry={true}/>
+              <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
+                <Entypo name='key' size={24} color='white'/>
+                <Text style={{color: 'white', flex: 1, fontSize: 24}}> Password</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.confirmPasswordArea}>
-            <TextInput
-              style={styles.confirmPassword}
-              value={confirmPassword}
-              onChangeText={(text)=> this.handleConfirm(text)}
-              secureTextEntry={true}/>
-            <Text style={{color: 'white', flex: 2, fontSize: 24, }}>
-              Confirm Password
-            </Text>
-          </View>
-          <View style={styles.userNameArea}>
-            <TextInput
-              style={styles.userName}
-              value={userName}
-              onChangeText={(text)=> this.handleUserName(text)}
-            />
-            <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
-              <AntDesign name='user' size={24} color='white'/>
-              <Text style={{color: 'white', flex: 1, fontSize: 24}}> Username</Text>
-              {taken ? <Text style={{color: 'red'}}>
-                Username is already taken, please try another userName
-                </Text>: null}
-            </View>
-          </View>
-            <TouchableOpacity
-              onPress={this.signUp}
-              style={styles.signUp}>
-              <Text style={{
-                color: 'white', fontSize: 24
-              }}
-                >sign up
+            <View style={styles.confirmPasswordArea}>
+              <TextInput
+                style={styles.confirmPassword}
+                value={confirmPassword}
+                onChangeText={(text)=> this.handleConfirm(text)}
+                secureTextEntry={true}/>
+              <Text style={{color: 'white', flex: 2, fontSize: 24, }}>
+                Confirm Password
               </Text>
-            </TouchableOpacity>
-        </View>
-      </View>
+            </View>
+            <View style={styles.userNameArea}>
+              <TextInput
+                style={styles.userName}
+                value={userName}
+                onChangeText={(text)=> this.handleUserName(text)}
+              />
+              <View style={{flex: 2, flexDirection: 'row', alignItems: 'flex-start'}}>
+                <AntDesign name='user' size={24} color='white'/>
+                <Text style={{color: 'white', flex: 1, fontSize: 24}}> Username</Text>
+                {taken ? <Text style={{color: 'red'}}>
+                  Username is already taken, please try another userName
+                  </Text>: null}
+              </View>
+            </View>
+              <TouchableOpacity
+                onPress={this.signUp}
+                style={styles.signUp}>
+                <Text style={{
+                  color: 'white', fontSize: 24
+                }}
+                  >sign up
+                </Text>
+              </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </DismissKeyboard>
     )
   }
 }

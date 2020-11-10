@@ -79,14 +79,12 @@ requestFriend= async (item)=> {
   const { authedUser, users }= this.props
   const sender= users[authedUser].uid
   const recepient= users[item.uid].uid
-  await db.ref(`users/${item.uid}/`).update({
-    recievedRequest: [sender],
-    }
-  )
-  await db.ref(`users/${authedUser}/`).update({
-    sentRequest: [recepient],
-    }
-  )
+  await db.ref(`users/${item.uid}/recievedRequest`).update({
+    from: sender
+  })
+  await db.ref(`users/${authedUser}/sentRequest`).update({
+    to: recepient
+  })
 }
 
   renderItem=({item})=> (
