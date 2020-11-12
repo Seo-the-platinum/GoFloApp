@@ -12,7 +12,8 @@ import {
 } from 'react-native'
 import { db } from '../utils/firebase'
 import { connect } from 'react-redux'
-import { Feather } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons'
+import UpdatedConvo from './UpdatedConvo'
 
 let _isMounted= false
 
@@ -26,9 +27,7 @@ class Conversation extends Component {
 
   componentDidMount() {
     _isMounted= true
-    const { authedUser, users }= this.props
     const { chat, uid }= this.props.route.params
-    console.log('chat here in did mount', chat)
     if (chat !== undefined) {
       let messagesRef= db.ref('messages/' + chat)
       messagesRef.on('value', snapshot=> {
@@ -175,7 +174,7 @@ class Conversation extends Component {
 
   render() {
     const { displayName, authedUser }= this.props
-    const { name, url, uid }= this.props.route.params
+    const { chat, name, url, uid }= this.props.route.params
     const { chronoOrder, str }= this.state
     let height= this.state.height
     return (
@@ -186,11 +185,11 @@ class Conversation extends Component {
       >
         <SafeAreaView style={styles.messageThread}>
           <View style={{flex: 1}}>
-            <FlatList
-              data={chronoOrder}
-              renderItem={this.renderMessages}
-              keyExtractor={item=> item.id}
-              inverted
+            <UpdatedConvo
+              authedUser={authedUser}
+              chat={chat}
+              uid={uid}
+              renderMessages={this.renderMessages}
             />
           </View>
         </SafeAreaView>

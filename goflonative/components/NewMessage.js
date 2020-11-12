@@ -91,7 +91,6 @@ class NewMessage extends Component {
 
   toMessage= (item)=> {
     const { authedUser, navigation, users }= this.props
-    console.log('authedUser and uid', authedUser, item.uid)
     let memberRef= db.ref(`members/`)
     memberRef.on('value', snapshot=> {
       let dbMembers= snapshot.val()
@@ -109,7 +108,6 @@ class NewMessage extends Component {
             return c
           }
         })
-        console.log('chat here after map', chat)
         if (chat[0] !== undefined) {
           navigation.navigate('Conversation', {
             uid: item.uid,
